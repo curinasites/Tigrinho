@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tiger Fortune - Slot Game</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --bg-deep:#060d07;--bg-primary:#0a1a0f;--bg-secondary:#0d2818;
+  --bg-card:#112318;--bg-card2:#162e20;
+  --gold:#FFD700;--gold-light:#FFE55C;--gold-dark:#B8860B;--gold-darker:#8B6914;
+  --red:#DC2626;--green:#22c55e;
+  --text-primary:#F0E6D2;--text-secondary:#A89880;--text-muted:#5e5548;
+  --border-gold:rgba(255,215,0,0.2);--glow-gold:rgba(255,215,0,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.font-cinzel{font-family:'Cinzel',serif}
+
+/* ===== CANVAS FUNDO ===== */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ===== TELAS ===== */
+.screen{display:none;position:relative;z-index:1;min-height:100vh}
+.screen.active{display:flex}
+
+/* ===== LOGIN ===== */
+#login-screen{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0d2818 0%,#060d07 70%);padding:20px}
+.login-card{background:linear-gradient(160deg,#132e1c,#0a1a0f);border:1px solid var(--border-gold);border-radius:24px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 0 80px rgba(255,215,0,0.04),0 30px 80px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,215,0,0.02),transparent,rgba(255,215,0,0.02),transparent);animation:rotBg 10s linear infinite}
+@keyframes rotBg{to{transform:rotate(360deg)}}
+.login-card>*{position:relative;z-index:1}
+
+.input-field{width:100%;padding:13px 16px;border-radius:12px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.12);color:var(--text-primary);font-size:14px;outline:none;transition:all .3s;font-family:'Poppins',sans-serif}
+.input-field:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(255,215,0,0.08)}
+.input-field::placeholder{color:var(--text-muted)}
+
+.btn-gold{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#FFD700,#B8860B);color:#0a1a0f;font-weight:800;font-size:15px;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:1.5px;font-family:'Poppins',sans-serif;position:relative;overflow:hidden}
+.btn-gold::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);transition:left .5s}
+.btn-gold:hover::after{left:100%}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,215,0,0.3)}
+.btn-gold:active{transform:translateY(0)}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-gold:disabled::after{display:none}
+
+.tab-btn{flex:1;padding:12px;border:none;background:transparent;color:var(--text-secondary);font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;font-family:'Poppins',sans-serif;font-size:14px}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ===== HEADER JOGO ===== */
+.game-header{width:100%;padding:10px 16px;background:linear-gradient(180deg,rgba(10,26,15,.97),rgba(6,13,7,.95));border-bottom:1px solid var(--border-gold);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.5);padding:8px 16px;border-radius:30px;border:1px solid var(--border-gold)}
+.balance-amount{color:var(--gold);font-weight:800;font-size:17px;min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ===== SLOT MACHINE ===== */
+.slot-container{margin:12px auto;position:relative;width:330px;max-width:92vw}
+.slot-frame{background:linear-gradient(160deg,#1a3d26,#0d1f14);border:2px solid var(--gold-dark);border-radius:20px;padding:18px 14px;box-shadow:0 0 50px rgba(255,215,0,0.06),inset 0 0 40px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+.slot-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.slot-frame::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent)}
+
+.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative}
+.slot-cell{aspect-ratio:1;border-radius:14px;background:linear-gradient(145deg,rgba(0,0,0,0.7),rgba(0,0,0,0.4));border:1px solid rgba(255,215,0,0.07);display:flex;align-items:center;justify-content:center;font-size:46px;position:relative;overflow:hidden;transition:border-color .4s,box-shadow .4s}
+.slot-cell.winning{border-color:var(--gold);box-shadow:0 0 25px rgba(255,215,0,0.5),inset 0 0 20px rgba(255,215,0,0.08);animation:winPulse .5s ease infinite alternate}
+@keyframes winPulse{0%{box-shadow:0 0 20px rgba(255,215,0,0.4)}100%{box-shadow:0 0 40px rgba(255,215,0,0.7),inset 0 0 25px rgba(255,215,0,0.12)}}
+
+.symbol-display{line-height:1;user-select:none;transition:transform .15s;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))}
+.slot-cell.bounce .symbol-display{animation:symBounce .35s ease}
+@keyframes symBounce{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+/* Linhas de pagamento */
+.payline{position:absolute;left:8px;right:8px;height:3px;border-radius:2px;opacity:0;transition:opacity .4s;pointer-events:none;z-index:5}
+.payline.show{opacity:.8}
+.payline-0{top:calc(16.67% - 1px);background:#ef4444}
+.payline-1{top:calc(50% - 1px);background:#22c55e}
+.payline-2{top:calc(83.33% - 1px);background:#3b82f6}
+
+/* ===== CONTROLES ===== */
+.controls-area{width:330px;max-width:92vw;margin:0 auto}
+.bet-controls{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.35);border-radius:16px;padding:12px 16px;border:1px solid var(--border-gold);margin-bottom:14px}
+.bet-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,215,0,0.08);border:1px solid var(--border-gold);color:var(--gold);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.bet-btn:hover{background:rgba(255,215,0,0.18);transform:scale(1.08)}
+.bet-btn:active{transform:scale(.95)}
+
+.spin-btn{width:100%;padding:18px;border:none;border-radius:16px;background:linear-gradient(135deg,#FFD700,#B8860B,#FFD700);background-size:200% 200%;color:#0a1a0f;font-weight:900;font-size:17px;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:3px;font-family:'Cinzel',serif;position:relative;overflow:hidden}
+.spin-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left .6s}
+.spin-btn:hover::before{left:100%}
+.spin-btn:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(255,215,0,0.35)}
+.spin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.spin-btn:disabled::before{display:none}
+.spin-btn.spinning{animation:btnShine 1.2s ease infinite}
+@keyframes btnShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* ===== TABELA PAGAMENTO ===== */
+.paytable{background:rgba(0,0,0,0.3);border-radius:16px;border:1px solid var(--border-gold);padding:16px;margin-top:14px;width:330px;max-width:92vw}
+.paytable-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,215,0,0.04)}
+.paytable-row:last-child{border:none}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'\f078';font-family:'Font Awesome 6 Free';font-weight:900;font-size:10px;margin-right:8px;transition:transform .3s;display:inline-block}
+details[open] summary::before{transform:rotate(180deg)}
+
+/* ===== WIN OVERLAY ===== */
+.win-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)}
+.win-overlay.show{display:flex}
+.win-content{text-align:center;animation:winPop .5s cubic-bezier(.17,.67,.29,1.3)}
+@keyframes winPop{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.win-amount{font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(255,215,0,0.5);font-family:'Cinzel',serif}
+
+/* ===== TOAST ===== */
+.toast-container{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 18px;border-radius:12px;background:var(--bg-card2);border:1px solid var(--border-gold);color:var(--text-primary);font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,0.5);animation:toastSlide .35s ease;max-width:300px;pointer-events:auto}
+.toast.error{border-color:rgba(220,38,38,.5);background:rgba(127,29,29,.4)}
+.toast.success{border-color:rgba(34,197,94,.4);background:rgba(20,83,45,.4)}
+@keyframes toastSlide{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ===== ADMIN ===== */
+#admin-screen{flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#0d2818 0%,#060d07 70%)}
+.admin-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:16px;padding:20px;margin-bottom:14px}
+.admin-input{padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.12);color:var(--text-primary);font-size:14px;outline:none;width:100%;transition:border-color .3s;font-family:'Poppins',sans-serif}
+.admin-input:focus{border-color:var(--gold)}
+.admin-btn{padding:10px 18px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all .2s;font-size:13px;font-family:'Poppins',sans-serif}
+.admin-btn-primary{background:linear-gradient(135deg,#FFD700,#B8860B);color:#0a1a0f}
+.admin-btn-danger{background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff}
+.admin-btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.admin-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,0,0,0.3)}
+.admin-btn:active{transform:translateY(0)}
+
+.user-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(0,0,0,0.25);margin-bottom:8px;border:1px solid rgba(255,215,0,0.04);transition:border-color .3s}
+.user-row:hover{border-color:rgba(255,215,0,0.15)}
+
+input[type="range"]{-webkit-appearance:none;width:100%;height:5px;background:rgba(255,215,0,0.12);border-radius:3px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 10px rgba(255,215,0,0.3)}
+
+/* ===== HISTÓRICO ===== */
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-bottom:4px;font-size:12px}
+
+/* ===== PARTÍCULAS VITÓRIA ===== */
+.win-particle{position:fixed;pointer-events:none;z-index:60;animation:pFly 1.4s ease-out forwards}
+@keyframes pFly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}100%{opacity:0;transform:translateY(-250px) scale(.2) rotate(360deg)}}
+
+/* ===== LOADING ===== */
+.spinner{width:22px;height:22px;border:3px solid rgba(255,215,0,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg-deep)}
+::-webkit-scrollbar-thumb{background:var(--gold-darker);border-radius:3px}
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:380px){
+  .slot-cell{font-size:36px}
+  .slot-container,.controls-area,.paytable{width:100%}
+  .win-amount{font-size:38px}
+  .login-card{padding:1.5rem}
+}
+
+.fade-in{animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Tigre brilho */
+.tiger-glow{filter:drop-shadow(0 0 12px rgba(255,215,0,0.3));animation:tigerBreath 3s ease infinite alternate}
+@keyframes tigerBreath{0%{filter:drop-shadow(0 0 8px rgba(255,215,0,0.2))}100%{filter:drop-shadow(0 0 20px rgba(255,215,0,0.45))}}
+
+/* Decoração cantos slot */
+.corner-deco{position:absolute;width:20px;height:20px;border-color:var(--gold-dark);z-index:2}
+.corner-deco.tl{top:6px;left:6px;border-top:2px solid;border-left:2px solid;border-radius:4px 0 0 0}
+.corner-deco.tr{top:6px;right:6px;border-top:2px solid;border-right:2px solid;border-radius:0 4px 0 0}
+.corner-deco.bl{bottom:6px;left:6px;border-bottom:2px solid;border-left:2px solid;border-radius:0 0 0 4px}
+.corner-deco.br{bottom:6px;right:6px;border-bottom:2px solid;border-right:2px solid;border-radius:0 0 4px 0}
+
+/* Stats card */
+.stat-card{text-align:center;padding:14px 10px;border-radius:12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,215,0,0.06)}
+.stat-card .stat-val{font-size:22px;font-weight:800;line-height:1.2}
+.stat-card .stat-label{font-size:11px;color:var(--text-muted);margin-top:4px}
+
+.header-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;border:none;background:transparent}
+.header-btn:hover{transform:scale(1.1)}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen" class="screen active">
+  <div class="login-card">
+    <div class="text-center mb-6">
+      <div class="tiger-glow" style="font-size:60px;line-height:1;margin-bottom:8px;">🐅</div>
+      <h1 class="font-cinzel text-3xl font-black" style="color:var(--gold);letter-spacing:2px;">TIGER FORTUNE</h1>
+      <p class="text-sm mt-2" style="color:var(--text-secondary);">Domine a selva, gire e ganhe</p>
+    </div>
+
+    <div class="flex mb-5" style="border-bottom:1px solid var(--border-gold);border-radius:8px 8px 0 0;overflow:hidden">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Entrar</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Cadastrar</button>
+    </div>
+
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="mb-4">
+        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label>
+        <input type="email" class="input-field" id="login-email" placeholder="seu@email.com" required>
+      </div>
+      <div class="mb-5">
+        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label>
+        <input type="password" class="input-field" id="login-password" placeholder="Minimo 6 caracteres" required minlength="6">
+      </div>
+      <button type="submit" class="btn-gold" id="login-btn"><i class="fas fa-sign-in-alt mr-2"></i>Entrar</button>
+    </form>
+
+    <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+      <div class="mb-4">
+        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-user mr-1"></i>Nome</label>
+        <input type="text" class="input-field" id="reg-name" placeholder="Seu nome" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label>
+        <input type="email" class="input-field" id="reg-email" placeholder="seu@email.com" required>
+      </div>
+      <div class="mb-5">
+        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label>
+        <input type="password" class="input-field" id="reg-password" placeholder="Minimo 6 caracteres" required minlength="6">
+      </div>
+      <button type="submit" class="btn-gold" id="register-btn"><i class="fas fa-user-plus mr-2"></i>Criar Conta</button>
+    </form>
+
+    <div id="login-status" class="text-center text-xs mt-4" style="color:var(--text-muted);">
+      <i class="fas fa-cloud mr-1"></i>Conectado ao Firebase
+    </div>
+  </div>
+</div>
+
+<!-- ============ JOGO ============ -->
+<div id="game-screen" class="screen" style="flex-direction:column;align-items:center;">
+  <header class="game-header">
+    <div class="flex items-center gap-2">
+      <span style="font-size:22px;" class="tiger-glow">🐅</span>
+      <span class="font-cinzel font-bold text-sm hidden sm:inline" style="color:var(--gold);">TIGER</span>
+    </div>
+    <div class="balance-display">
+      <i class="fas fa-coins text-sm" style="color:var(--gold);"></i>
+      <span class="balance-amount" id="balance-display">0.00</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <button id="admin-nav-btn" style="display:none;" onclick="showScreen('admin-screen')" class="header-btn" title="Painel Admin">
+        <i class="fas fa-cog text-sm" style="color:var(--gold);"></i>
+      </button>
+      <button onclick="handleLogout()" class="header-btn" title="Sair">
+        <i class="fas fa-sign-out-alt text-sm" style="color:#ef4444;"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col items-center py-3 px-4" style="gap:10px;width:100%;max-width:500px;">
+    <!-- Info aposta/ganho -->
+    <div class="flex items-center justify-between w-full" style="max-width:330px;">
+      <div class="text-center">
+        <div class="text-[10px] font-semibold" style="color:var(--text-muted);">APOSTA</div>
+        <div class="font-extrabold" style="color:var(--gold);" id="current-bet-display">1.00</div>
+      </div>
+      <div id="win-indicator" style="opacity:0;transition:opacity .5s;">
+        <span class="font-cinzel font-bold text-sm" style="color:var(--green);" id="win-text">GANHOU!</span>
+      </div>
+      <div class="text-center">
+        <div class="text-[10px] font-semibold" style="color:var(--text-muted);">GANHO</div>
+        <div class="font-extrabold" style="color:var(--green);" id="last-win-display">0.00</div>
+      </div>
+    </div>
+
+    <!-- Slot Machine -->
+    <div class="slot-container">
+      <div class="slot-frame">
+        <div class="corner-deco tl"></div>
+        <div class="corner-deco tr"></div>
+        <div class="corner-deco bl"></div>
+        <div class="corner-deco br"></div>
+        <div class="slot-grid" id="slot-grid"></div>
+        <div class="payline payline-0" id="payline-0"></div>
+        <div class="payline payline-1" id="payline-1"></div>
+        <div class="payline payline-2" id="payline-2"></div>
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="controls-area">
+      <div class="bet-controls">
+        <button class="bet-btn" onclick="changeBet(-1)" aria-label="Diminuir aposta"><i class="fas fa-minus"></i></button>
+        <div class="flex-1 text-center">
+          <div class="text-[10px] font-semibold" style="color:var(--text-muted);">VALOR DA APOSTA</div>
+          <div class="font-extrabold text-lg" style="color:var(--gold);" id="bet-value">1.00</div>
+        </div>
+        <button class="bet-btn" onclick="changeBet(1)" aria-label="Aumentar aposta"><i class="fas fa-plus"></i></button>
+      </div>
+      <button class="spin-btn" id="spin-btn" onclick="handleSpin()"><i class="fas fa-play mr-2"></i>GIRAR</button>
+    </div>
+
+    <!-- Paytable -->
+    <details class="paytable">
+      <summary class="font-cinzel font-bold text-sm" style="color:var(--gold);"><i class="fas fa-trophy mr-2"></i>Tabela de Pagamentos</summary>
+      <div id="paytable-content" class="mt-3"></div>
+    </details>
+
+    <!-- Histórico -->
+    <div class="paytable" style="max-height:180px;overflow-y:auto;">
+      <div class="font-cinzel font-bold text-sm mb-2" style="color:var(--gold);"><i class="fas fa-history mr-2"></i>Historico</div>
+      <div id="history-list"><p class="text-xs" style="color:var(--text-muted);">Nenhuma jogada ainda</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ ADMIN ============ -->
+<div id="admin-screen" class="screen" style="flex-direction:column;">
+  <header class="game-header">
+    <div class="flex items-center gap-3">
+      <button onclick="showScreen('game-screen')" class="header-btn" title="Voltar">
+        <i class="fas fa-arrow-left text-sm" style="color:var(--gold);"></i>
+      </button>
+      <span class="font-cinzel font-bold text-sm" style="color:var(--gold);">PAINEL ADMIN</span>
+    </div>
+    <div class="balance-display">
+      <i class="fas fa-coins text-sm" style="color:var(--gold);"></i>
+      <span class="balance-amount" id="admin-balance-display">0.00</span>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-2xl mx-auto p-4" style="padding-top:16px;">
+    <!-- Probabilidades -->
+    <div class="admin-card fade-in">
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-sliders-h mr-2"></i>Probabilidades</h2>
+
+      <div class="mb-5">
+        <div class="flex justify-between mb-2">
+          <label class="text-sm" style="color:var(--text-secondary);">Taxa de Vitoria</label>
+          <span class="font-bold text-sm" style="color:var(--gold);" id="win-rate-val">30%</span>
+        </div>
+        <input type="range" min="5" max="80" value="30" id="win-rate-slider" oninput="document.getElementById('win-rate-val').textContent=this.value+'%'">
+        <div class="flex justify-between text-[10px] mt-1" style="color:var(--text-muted);"><span>5% Dificil</span><span>80% Facil</span></div>
+      </div>
+
+      <div class="mb-5">
+        <div class="flex justify-between mb-2">
+          <label class="text-sm" style="color:var(--text-secondary);">Chance Big Win (3 Tigres)</label>
+          <span class="font-bold text-sm" style="color:var(--gold);" id="big-win-val">5%</span>
+        </div>
+        <input type="range" min="1" max="30" value="5" id="big-win-slider" oninput="document.getElementById('big-win-val').textContent=this.value+'%'">
+      </div>
+
+      <h3 class="font-bold text-xs mb-3 mt-4" style="color:var(--text-secondary);"><i class="fas fa-dice mr-1"></i>Frequencia dos Simbolos</h3>
+      <div id="symbol-weights" class="grid grid-cols-2 gap-3 mb-5"></div>
+
+      <button class="admin-btn admin-btn-primary w-full" onclick="saveConfig()"><i class="fas fa-save mr-2"></i>Salvar Configuracoes</button>
+    </div>
+
+    <!-- Config gerais -->
+    <div class="admin-card fade-in">
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-cog mr-2"></i>Configuracoes Gerais</h2>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Creditos Iniciais</label>
+          <input type="number" class="admin-input" id="initial-credits" value="100" min="0" step="10">
+        </div>
+        <div>
+          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Minima</label>
+          <input type="number" class="admin-input" id="min-bet" value="1" min="0.5" step="0.5">
+        </div>
+        <div>
+          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Maxima</label>
+          <input type="number" class="admin-input" id="max-bet" value="100" min="10" step="10">
+        </div>
+        <div>
+          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Multiplicador Tigre</label>
+          <input type="number" class="admin-input" id="tiger-mult" value="50" min="5" step="5">
+        </div>
+      </div>
+      <button class="admin-btn admin-btn-primary w-full" onclick="saveGeneralConfig()"><i class="fas fa-save mr-2"></i>Salvar</button>
+    </div>
+
+    <!-- Usuarios -->
+    <div class="admin-card fade-in">
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-users mr-2"></i>Gerenciar Usuarios</h2>
+      <div class="flex gap-2 mb-4">
+        <input type="email" class="admin-input flex-1" id="admin-user-email" placeholder="Email do usuario">
+        <input type="number" class="admin-input" id="admin-credit-amount" placeholder="Qtd" style="width:90px;" value="100">
+        <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="adminAddCredits()" title="Adicionar creditos"><i class="fas fa-plus"></i></button>
+      </div>
+      <div id="users-list">
+        <div class="text-center py-4"><div class="spinner"></div><p class="text-xs mt-2" style="color:var(--text-muted);">Carregando...</p></div>
+      </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="admin-card fade-in">
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-chart-bar mr-2"></i>Estatisticas</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="stat-card"><div class="stat-val" style="color:var(--gold);" id="stat-users">0</div><div class="stat-label">Usuarios</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--gold);" id="stat-spins">0</div><div class="stat-label">Giros Totais</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#ef4444;" id="stat-house">0</div><div class="stat-label">Casa Ganhou</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#22c55e;" id="stat-players">0</div><div class="stat-label">Jogadores Ganhou</div></div>
+      </div>
+    </div>
+
+    <div style="height:30px;"></div>
+  </main>
+</div>
+
+<!-- Win Overlay -->
+<div class="win-overlay" id="win-overlay" onclick="closeWinOverlay()">
+  <div class="win-content">
+    <div style="font-size:68px;margin-bottom:8px;" class="tiger-glow">🐅</div>
+    <div class="font-cinzel text-xl font-bold mb-1" style="color:var(--gold);" id="win-title">BIG WIN!</div>
+    <div class="win-amount" id="win-amount-display">+0.00</div>
+    <p class="text-xs mt-3" style="color:var(--text-muted);">Toque para continuar</p>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   FIREBASE CONFIG
+   ================================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAoTpeweJAuluIYFwLkVhiUVso8yxU8T_s",
+  authDomain: "francisco-sites.firebaseapp.com",
+  databaseURL: "https://francisco-sites-default-rtdb.firebaseio.com",
+  projectId: "francisco-sites",
+  storageBucket: "francisco-sites.firebasestorage.app",
+  messagingSenderId: "386716924748",
+  appId: "1:386716924748:web:8a057ba19e234519416de9",
+  measurementId: "G-109R7EMCBQ"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ================================================================
+   SÍMBOLOS DO JOGO
+   ================================================================ */
+let SYMBOLS = [
+  { id:'tiger',   emoji:'🐅', name:'Tigre',    multiplier:50, color:'#FFD700', defaultWeight:5  },
+  { id:'diamond', emoji:'💎', name:'Diamante',  multiplier:25, color:'#60A5FA', defaultWeight:10 },
+  { id:'lantern', emoji:'🏮', name:'Lanterna',  multiplier:15, color:'#F87171', defaultWeight:15 },
+  { id:'envelope',emoji:'🧧', name:'Envelope',  multiplier:10, color:'#FB923C', defaultWeight:20 },
+  { id:'coin',    emoji:'🪙', name:'Moeda',     multiplier:5,  color:'#FBBF24', defaultWeight:25 },
+  { id:'bamboo',  emoji:'🎋', name:'Bambu',     multiplier:3,  color:'#34D399', defaultWeight:25 },
+];
+
+const PAYLINES = [
+  [0,1,2], // topo
+  [3,4,5], // centro
+  [6,7,8], // baixo
+];
+
+/* ================================================================
+   ESTADO GLOBAL
+   ================================================================ */
+const S = {
+  user: null,
+  uid: null,
+  userData: null,
+  spinning: false,
+  bet: 1,
+  balance: 100,
+  history: [],
+  config: {
+    winRate: 30,
+    bigWinRate: 5,
+    initialCredits: 100,
+    minBet: 1,
+    maxBet: 100,
+    tigerMultiplier: 50,
+    symbolWeights: null, // preenchido com defaultWeight
+  },
+  stats: { totalSpins:0, houseWon:0, playersWon:0 },
+  unsubUsers: null,
+};
+
+// Inicializar pesos padrão
+if (!S.config.symbolWeights) {
+  S.config.symbolWeights = {};
+  SYMBOLS.forEach(s => S.config.symbolWeights[s.id] = s.defaultWeight);
+}
+
+/* ================================================================
+   AUTH
+   ================================================================ */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    S.user = user;
+    S.uid = user.uid;
+    await loadUserData();
+    await loadGameConfig();
+    enterGame();
+  } else {
+    S.user = null;
+    S.uid = null;
+    showScreen('login-screen');
+  }
+});
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(err) {
+    showToast(translateError(err.code), 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Entrar';
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    // Verificar se é o primeiro usuário
+    const usersSnap = await db.collection('tiger_users').limit(1).get();
+    const isAdmin = usersSnap.empty;
+    await db.collection('tiger_users').doc(cred.user.uid).set({
+      name, email, credits: S.config.initialCredits,
+      isAdmin, totalSpins: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Conta criada com sucesso!', 'success');
+  } catch(err) {
+    showToast(translateError(err.code), 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Criar Conta';
+}
+
+function handleLogout() {
+  if (S.unsubUsers) { S.unsubUsers(); S.unsubUsers = null; }
+  auth.signOut();
+}
+
+function translateError(code) {
+  const map = {
+    'auth/user-not-found':'Usuario nao encontrado',
+    'auth/wrong-password':'Senha incorreta',
+    'auth/email-already-in-use':'Email ja cadastrado',
+    'auth/weak-password':'Senha muito fraca (minimo 6 caracteres)',
+    'auth/invalid-email':'Email invalido',
+    'auth/invalid-credential':'Email ou senha incorretos',
+    'auth/too-many-requests':'Muitas tentativas. Tente novamente mais tarde',
+  };
+  return map[code] || 'Erro: ' + code;
+}
+
+/* ================================================================
+   CARREGAR DADOS
+   ================================================================ */
+async function loadUserData() {
+  try {
+    const doc = await db.collection('tiger_users').doc(S.uid).get();
+    if (doc.exists) {
+      S.userData = doc.data();
+      S.balance = S.userData.credits || 0;
+    } else {
+      // Criar documento se não existe
+      S.userData = { name: S.user.displayName || S.user.email, email: S.user.email, credits: S.config.initialCredits, isAdmin: false, totalSpins: 0 };
+      S.balance = S.config.initialCredits;
+      await db.collection('tiger_users').doc(S.uid).set(S.userData);
+    }
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+    S.userData = { name: S.user.email, credits: 100, isAdmin: false };
+    S.balance = 100;
+  }
+}
+
+async function loadGameConfig() {
+  try {
+    const doc = await db.collection('tiger_config').doc('game').get();
+    if (doc.exists) {
+      const data = doc.data();
+      S.config = { ...S.config, ...data };
+      // Atualizar multiplicador do tigre
+      if (data.tigerMultiplier) SYMBOLS[0].multiplier = data.tigerMultiplier;
+    }
+  } catch(e) { console.error('Erro config:', e); }
+
+  try {
+    const doc = await db.collection('tiger_config').doc('stats').get();
+    if (doc.exists) S.stats = { ...S.stats, ...doc.data() };
+  } catch(e) {}
+}
+
+/* ================================================================
+   ENTRAR NO JOGO
+   ================================================================ */
+function enterGame() {
+  document.getElementById('admin-nav-btn').style.display = S.userData.isAdmin ? 'flex' : 'none';
+  updateBalance();
+  buildSlotGrid();
+  buildPaytable();
+  showScreen('game-screen');
+  showToast('Bem-vindo, ' + (S.userData.name || S.userData.email) + '!', 'success');
+}
+
+/* ================================================================
+   INTERFACE
+   ================================================================ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'admin-screen') loadAdminData();
+}
+
+function showToast(msg, type='info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icons = { error:'fa-exclamation-circle', success:'fa-check-circle', info:'fa-info-circle' };
+  t.innerHTML = '<i class="fas ' + (icons[type]||icons.info) + ' mr-2"></i>' + msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+
+function updateBalance() {
+  document.getElementById('balance-display').textContent = S.balance.toFixed(2);
+  document.getElementById('admin-balance-display').textContent = S.balance.toFixed(2);
+  document.getElementById('current-bet-display').textContent = S.bet.toFixed(2);
+  document.getElementById('bet-value').textContent = S.bet.toFixed(2);
+}
+
+/* ================================================================
+   SLOT GRID
+   ================================================================ */
+function buildSlotGrid() {
+  const grid = document.getElementById('slot-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'slot-cell';
+    cell.id = 'cell-' + i;
+    const sym = document.createElement('span');
+    sym.className = 'symbol-display';
+    sym.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
+    cell.appendChild(sym);
+    grid.appendChild(cell);
+  }
+}
+
+function buildPaytable() {
+  const c = document.getElementById('paytable-content');
+  c.innerHTML = '';
+  SYMBOLS.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'paytable-row';
+    row.innerHTML = `
+      <div class="flex items-center gap-1">
+        <span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span>
+        <span class="ml-2 text-xs" style="color:var(--text-secondary);">${s.name}</span>
+      </div>
+      <span class="font-bold text-sm" style="color:${s.color};">${s.multiplier}x</span>`;
+    c.appendChild(row);
+  });
+  const wild = document.createElement('div');
+  wild.className = 'paytable-row';
+  wild.innerHTML = '<div class="flex items-center gap-1"><span style="font-size:18px;">🐅</span><span class="text-xs ml-2" style="color:var(--text-secondary);">Tigre = Wild (substitui todos)</span></div><span class="font-bold text-xs" style="color:var(--gold);">WILD</span>';
+  c.appendChild(wild);
+}
+
+/* ================================================================
+   LÓGICA DO JOGO
+   ================================================================ */
+function changeBet(dir) {
+  const min = S.config.minBet;
+  const max = Math.min(S.config.maxBet, S.balance);
+  let step = S.bet >= 50 ? 10 : S.bet >= 20 ? 5 : S.bet >= 10 ? 2 : 0.5;
+  S.bet = Math.max(min, Math.min(max, S.bet + dir * step));
+  S.bet = Math.round(S.bet * 100) / 100;
+  updateBalance();
+}
+
+function weightedRandom() {
+  const w = S.config.symbolWeights;
+  const entries = SYMBOLS.map(s => [s, w[s.id] || s.defaultWeight]);
+  const total = entries.reduce((sum,[,wt]) => sum + wt, 0);
+  let r = Math.random() * total;
+  for (const [sym, wt] of entries) { r -= wt; if (r <= 0) return sym; }
+  return SYMBOLS[SYMBOLS.length - 1];
+}
+
+function generateResult() {
+  const wr = S.config.winRate / 100;
+  const bwr = S.config.bigWinRate / 100;
+  const willWin = Math.random() < wr;
+  const willBigWin = willWin && Math.random() < bwr;
+  const grid = Array(9).fill(null);
+
+  if (willBigWin) {
+    // 3 tigres na linha central
+    const t = SYMBOLS[0];
+    grid[3] = t; grid[4] = t; grid[5] = t;
+    for (let i = 0; i < 9; i++) if (!grid[i]) grid[i] = weightedRandom();
+    breakLine(grid, 0); breakLine(grid, 2);
+    return grid;
+  }
+
+  if (willWin) {
+    const li = Math.floor(Math.random() * PAYLINES.length);
+    const line = PAYLINES[li];
+    const winSym = Math.random() < 0.08 ? SYMBOLS[0] : SYMBOLS[1 + Math.floor(Math.random() * (SYMBOLS.length - 1))];
+    line.forEach(idx => { grid[idx] = winSym; });
+    for (let i = 0; i < 9; i++) if (!grid[i]) grid[i] = weightedRandom();
+    PAYLINES.forEach((pl, i) => { if (i !== li) breakLine(grid, i); });
+    return grid;
+  }
+
+  // Sem vitória
+  for (let i = 0; i < 9; i++) grid[i] = weightedRandom();
+  PAYLINES.forEach((_, i) => breakLine(grid, i));
+  return grid;
+}
+
+function breakLine(grid, paylineIdx) {
+  const line = PAYLINES[paylineIdx];
+  const ids = line.map(i => grid[i].id);
+  // 3 iguais
+  if (ids[0] === ids[1] && ids[1] === ids[2]) {
+    const avail = SYMBOLS.filter(s => s.id !== ids[0]);
+    grid[line[2]] = avail[Math.floor(Math.random() * avail.length)];
+  }
+  // Wild check: 2+ tigres + outro símbolo = vitória
+  const tigerCt = ids.filter(id => id === 'tiger').length;
+  if (tigerCt >= 2) {
+    const nonTiger = line.filter(i => grid[i].id !== 'tiger');
+    if (nonTiger.length > 0 && nonTiger.length < 3) {
+      // Verificar se os não-tigre são iguais
+      const nonIds = nonTiger.map(i => grid[i].id);
+      if (nonIds.every(id => id === nonIds[0])) {
+        const avail = SYMBOLS.filter(s => s.id !== 'tiger' && s.id !== nonIds[0]);
+        if (avail.length > 0) grid[nonTiger[0]] = avail[Math.floor(Math.random() * avail.length)];
+      }
+    }
+  }
+  // 2 iguais + 1 wild (tigre) = vitória com wild
+  if (tigerCt === 1) {
+    const nonTigerIds = ids.filter(id => id !== 'tiger');
+    if (nonTigerIds[0] === nonTigerIds[1]) {
+      const avail = SYMBOLS.filter(s => s.id !== nonTigerIds[0] && s.id !== 'tiger');
+      if (avail.length > 0) {
+        const tigerIdx = line.findIndex(i => grid[i].id === 'tiger');
+        grid[line[tigerIdx]] = avail[Math.floor(Math.random() * avail.length)];
+      }
+    }
+  }
+}
+
+function calculateWins(grid) {
+  const wins = [];
+  PAYLINES.forEach((line, idx) => {
+    const cells = line.map(i => grid[i]);
+    const ids = cells.map(c => c.id);
+    // 3 iguais
+    if (ids[0] === ids[1] && ids[1] === ids[2]) {
+      wins.push({ lineIdx: idx, symbol: cells[0], cells: line });
+      return;
+    }
+    // Com wild
+    const nonWild = ids.filter(id => id !== 'tiger');
+    const tigers = ids.filter(id => id === 'tiger').length;
+    if (tigers > 0 && nonWild.length > 0 && nonWild.every(id => id === nonWild[0])) {
+      wins.push({ lineIdx: idx, symbol: SYMBOLS.find(s => s.id === nonWild[0]), cells: line, hasWild: true });
+    }
+  });
+  return wins;
+}
+
+/* ================================================================
+   ANIMAÇÃO DE GIRO
+   ================================================================ */
+async function handleSpin() {
+  if (S.spinning) return;
+  if (S.balance < S.bet) { showToast('Creditos insuficientes!', 'error'); return; }
+
+  S.spinning = true;
+  const btn = document.getElementById('spin-btn');
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  btn.innerHTML = '<i class="fas fa-sync-alt fa-spin mr-2"></i>GIRANDO...';
+
+  // Esconder indicadores anteriores
+  document.querySelectorAll('.payline').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.slot-cell').forEach(c => c.classList.remove('winning'));
+  document.getElementById('win-indicator').style.opacity = '0';
+
+  // Deduzir aposta
+  S.balance = Math.round((S.balance - S.bet) * 100) / 100;
+  updateBalance();
+
+  // Gerar resultado
+  const result = generateResult();
+
+  // Animar colunas
+  const cells = document.querySelectorAll('.slot-cell');
+  cells.forEach(c => c.classList.add('spinning'));
+
+  // Troca rápida de símbolos
+  const spinInt = setInterval(() => {
+    cells.forEach(c => {
+      if (c.classList.contains('spinning')) {
+        c.querySelector('.symbol-display').textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
+      }
+    });
+  }, 70);
+
+  // Parar colunas com delay
+  const colDelays = [500, 900, 1300];
+  for (let col = 0; col < 3; col++) {
+    await sleep(colDelays[col]);
+    for (let row = 0; row < 3; row++) {
+      const idx = row * 3 + col;
+      const cell = document.getElementById('cell-' + idx);
+      cell.classList.remove('spinning');
+      const sym = cell.querySelector('.symbol-display');
+      sym.textContent = result[idx].emoji;
+      cell.classList.add('bounce');
+      setTimeout(() => cell.classList.remove('bounce'), 350);
+    }
+  }
+  clearInterval(spinInt);
+
+  // Calcular ganhos
+  const wins = calculateWins(result);
+  let totalWin = 0;
+
+  if (wins.length > 0) {
+    wins.forEach(win => {
+      totalWin += S.bet * win.symbol.multiplier;
+      win.cells.forEach(ci => document.getElementById('cell-' + ci).classList.add('winning'));
+      const pl = document.getElementById('payline-' + win.lineIdx);
+      if (pl) pl.classList.add('show');
+    });
+
+    S.balance = Math.round((S.balance + totalWin) * 100) / 100;
+    updateBalance();
+    document.getElementById('last-win-display').textContent = totalWin.toFixed(2);
+    document.getElementById('win-indicator').style.opacity = '1';
+
+    if (totalWin >= S.bet * 25) {
+      showWinOverlay(totalWin, totalWin >= S.bet * 50 ? 'MEGA WIN!' : 'BIG WIN!');
+      spawnParticles(25);
+    } else if (totalWin >= S.bet * 10) {
+      showToast('Mega ganho: +' + totalWin.toFixed(2), 'success');
+      spawnParticles(12);
+    } else {
+      showToast('Ganho: +' + totalWin.toFixed(2), 'success');
+      spawnParticles(5);
+    }
+  } else {
+    document.getElementById('last-win-display').textContent = '0.00';
+  }
+
+  // Estatísticas
+  S.stats.totalSpins++;
+  if (totalWin > 0) S.stats.playersWon += totalWin; else S.stats.houseWon += S.bet;
+
+  // Salvar no Firestore
+  try {
+    await db.collection('tiger_users').doc(S.uid).update({ credits: S.balance, totalSpins: firebase.firestore.FieldValue.increment(1) });
+    await db.collection('tiger_config').doc('stats').set(S.stats, { merge: true });
+  } catch(e) { console.error('Erro ao salvar:', e); }
+
+  // Histórico local
+  S.history.unshift({ bet: S.bet, win: totalWin, symbols: result.map(s => s.emoji), time: new Date().toLocaleTimeString() });
+  if (S.history.length > 30) S.history.pop();
+  updateHistory();
+
+  S.spinning = false;
+  btn.disabled = false;
+  btn.classList.remove('spinning');
+  btn.innerHTML = '<i class="fas fa-play mr-2"></i>GIRAR';
+
+  if (S.balance <= 0) setTimeout(() => showToast('Creditos acabaram! Contate o admin.', 'error'), 500);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showWinOverlay(amount, title) {
+  document.getElementById('win-title').textContent = title || 'BIG WIN!';
+  document.getElementById('win-amount-display').textContent = '+' + amount.toFixed(2);
+  document.getElementById('win-overlay').classList.add('show');
+}
+
+function closeWinOverlay() { document.getElementById('win-overlay').classList.remove('show'); }
+
+function spawnParticles(n) {
+  const emojis = ['✨','🪙','💰','🐅','⭐','💎'];
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'win-particle';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.left = (15 + Math.random() * 70) + 'vw';
+      p.style.top = (35 + Math.random() * 35) + 'vh';
+      p.style.fontSize = (18 + Math.random() * 14) + 'px';
+      p.style.animationDuration = (1 + Math.random() * 0.8) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2000);
+    }, i * 80);
+  }
+}
+
+function updateHistory() {
+  const list = document.getElementById('history-list');
+  if (!S.history.length) { list.innerHTML = '<p class="text-xs" style="color:var(--text-muted);">Nenhuma jogada ainda</p>'; return; }
+  list.innerHTML = S.history.slice(0, 12).map(h => `
+    <div class="history-item">
+      <div class="flex items-center gap-2">
+        <span style="color:var(--text-muted);font-size:10px;">${h.time}</span>
+        <span style="font-size:14px;">${h.symbols[3]}${h.symbols[4]}${h.symbols[5]}</span>
+      </div>
+      <div>
+        <span style="color:var(--text-muted);font-size:10px;">${h.bet.toFixed(2)}</span>
+        ${h.win > 0 ? '<span class="ml-1 font-bold" style="color:#22c55e;">+' + h.win.toFixed(2) + '</span>' : '<span class="ml-1" style="color:#ef4444;">-</span>'}
+      </div>
+    </div>`).join('');
+}
+
+/* ================================================================
+   ADMIN
+   ================================================================ */
+function loadAdminData() {
+  document.getElementById('win-rate-slider').value = S.config.winRate;
+  document.getElementById('win-rate-val').textContent = S.config.winRate + '%';
+  document.getElementById('big-win-slider').value = S.config.bigWinRate;
+  document.getElementById('big-win-val').textContent = S.config.bigWinRate + '%';
+  document.getElementById('initial-credits').value = S.config.initialCredits;
+  document.getElementById('min-bet').value = S.config.minBet;
+  document.getElementById('max-bet').value = S.config.maxBet;
+  document.getElementById('tiger-mult').value = S.config.tigerMultiplier || SYMBOLS[0].multiplier;
+
+  // Pesos
+  const wc = document.getElementById('symbol-weights');
+  wc.innerHTML = '';
+  SYMBOLS.forEach(sym => {
+    const w = S.config.symbolWeights[sym.id] || sym.defaultWeight;
+    const d = document.createElement('div');
+    d.className = 'flex items-center gap-2 p-2 rounded-lg';
+    d.style.background = 'rgba(0,0,0,0.25)';
+    d.innerHTML = `
+      <span style="font-size:22px;">${sym.emoji}</span>
+      <div class="flex-1">
+        <div class="text-[10px]" style="color:var(--text-muted);">${sym.name}</div>
+        <input type="range" min="1" max="50" value="${w}" id="wt-${sym.id}" style="height:4px;">
+      </div>
+      <span class="text-xs font-bold" style="color:var(--gold);" id="wtv-${sym.id}">${w}</span>`;
+    wc.appendChild(d);
+    setTimeout(() => {
+      const sl = document.getElementById('wt-' + sym.id);
+      if (sl) sl.addEventListener('input', () => document.getElementById('wtv-' + sym.id).textContent = sl.value);
+    }, 0);
+  });
+
+  loadUsersList();
+  updateStats();
+}
+
+async function loadUsersList() {
+  const c = document.getElementById('users-list');
+  try {
+    const snap = await db.collection('tiger_users').orderBy('createdAt', 'desc').get();
+    const users = [];
+    snap.forEach(doc => users.push({ uid: doc.id, ...doc.data() }));
+    document.getElementById('stat-users').textContent = users.length;
+    renderUsers(c, users);
+  } catch(e) {
+    // Fallback: sem ordenação
+    try {
+      const snap = await db.collection('tiger_users').get();
+      const users = [];
+      snap.forEach(doc => users.push({ uid: doc.id, ...doc.data() }));
+      document.getElementById('stat-users').textContent = users.length;
+      renderUsers(c, users);
+    } catch(e2) {
+      c.innerHTML = '<p class="text-xs" style="color:#ef4444;">Erro ao carregar usuarios</p>';
+    }
+  }
+}
+
+function renderUsers(container, users) {
+  if (!users.length) { container.innerHTML = '<p class="text-xs" style="color:var(--text-muted);">Nenhum usuario</p>'; return; }
+  container.innerHTML = users.map(u => `
+    <div class="user-row">
+      <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style="background:rgba(255,215,0,0.08);border:1px solid var(--border-gold);color:var(--gold);">
+        ${(u.name||u.email)[0].toUpperCase()}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold text-xs truncate">${u.name||'Sem nome'} ${u.isAdmin?'<i class="fas fa-crown text-yellow-500 ml-1"></i>':''}</div>
+        <div class="text-[10px] truncate" style="color:var(--text-muted);">${u.email}</div>
+      </div>
+      <div class="text-right mr-1">
+        <div class="font-bold text-xs" style="color:var(--gold);">${(u.credits||0).toFixed(2)}</div>
+        <div class="text-[10px]" style="color:var(--text-muted);">${u.totalSpins||0} giros</div>
+      </div>
+      <div class="flex gap-1">
+        <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="quickCredits('${u.uid}',50)">+50</button>
+        <button class="admin-btn admin-btn-danger admin-btn-sm" onclick="quickCredits('${u.uid}',-50)">-50</button>
+        <button class="admin-btn admin-btn-sm" style="background:rgba(255,215,0,0.08);color:var(--gold);border:1px solid var(--border-gold);" onclick="toggleAdmin('${u.uid}',${!u.isAdmin})" title="${u.isAdmin?'Remover admin':'Tornar admin'}">
+          <i class="fas fa-crown"></i>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function updateStats() {
+  document.getElementById('stat-spins').textContent = S.stats.totalSpins;
+  document.getElementById('stat-house').textContent = S.stats.houseWon.toFixed(0);
+  document.getElementById('stat-players').textContent = S.stats.playersWon.toFixed(0);
+}
+
+async function saveConfig() {
+  S.config.winRate = parseInt(document.getElementById('win-rate-slider').value);
+  S.config.bigWinRate = parseInt(document.getElementById('big-win-slider').value);
+
+  SYMBOLS.forEach(sym => {
+    const sl = document.getElementById('wt-' + sym.id);
+    if (sl) S.config.symbolWeights[sym.id] = parseInt(sl.value);
+  });
+
+  try {
+    await db.collection('tiger_config').doc('game').set(S.config, { merge: true });
+    showToast('Configuracoes salvas!', 'success');
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+  }
+}
+
+async function saveGeneralConfig() {
+  S.config.initialCredits = parseFloat(document.getElementById('initial-credits').value) || 100;
+  S.config.minBet = parseFloat(document.getElementById('min-bet').value) || 1;
+  S.config.maxBet = parseFloat(document.getElementById('max-bet').value) || 100;
+  S.config.tigerMultiplier = parseFloat(document.getElementById('tiger-mult').value) || 50;
+  SYMBOLS[0].multiplier = S.config.tigerMultiplier;
+  buildPaytable();
+
+  try {
+    await db.collection('tiger_config').doc('game').set(S.config, { merge: true });
+    showToast('Configuracoes gerais salvas!', 'success');
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+  }
+}
+
+async function quickCredits(uid, amount) {
+  try {
+    await db.collection('tiger_users').doc(uid).update({ credits: firebase.firestore.FieldValue.increment(amount) });
+    // Se for o usuário logado, atualizar local
+    if (uid === S.uid) {
+      S.balance = Math.round((S.balance + amount) * 100) / 100;
+      S.balance = Math.max(0, S.balance);
+      updateBalance();
+    }
+    loadUsersList();
+    showToast((amount > 0 ? '+' : '') + amount + ' creditos aplicados', 'success');
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+async function adminAddCredits() {
+  const email = document.getElementById('admin-user-email').value.trim();
+  const amount = parseFloat(document.getElementById('admin-credit-amount').value);
+  if (!email) { showToast('Digite o email', 'error'); return; }
+  if (isNaN(amount)) { showToast('Valor invalido', 'error'); return; }
+
+  try {
+    const snap = await db.collection('tiger_users').where('email', '==', email).limit(1).get();
+    if (snap.empty) { showToast('Usuario nao encontrado', 'error'); return; }
+    const doc = snap.docs[0];
+    await db.collection('tiger_users').doc(doc.id).update({ credits: firebase.firestore.FieldValue.increment(amount) });
+    if (doc.id === S.uid) {
+      S.balance = Math.round((S.balance + amount) * 100) / 100;
+      updateBalance();
+    }
+    loadUsersList();
+    showToast('Creditos adicionados a ' + email, 'success');
+    document.getElementById('admin-user-email').value = '';
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+async function toggleAdmin(uid, makeAdmin) {
+  try {
+    await db.collection('tiger_users').doc(uid).update({ isAdmin: makeAdmin });
+    loadUsersList();
+    showToast(makeAdmin ? 'Admin atribuido!' : 'Admin removido!', 'success');
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+/* ================================================================
+   PARTÍCULAS DE FUNDO
+   ================================================================ */
+function initBgCanvas() {
+  const cv = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  const particles = [];
+  const MAX = 35;
+
+  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class P {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * cv.width;
+      this.y = init ? Math.random() * cv.height : cv.height + 10;
+      this.r = Math.random() * 1.8 + 0.4;
+      this.vx = (Math.random() - 0.5) * 0.25;
+      this.vy = -(Math.random() * 0.4 + 0.08);
+      this.o = Math.random() * 0.35 + 0.05;
+      this.life = Math.random() * 300 + 150;
+      this.maxLife = this.life;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy; this.life--;
+      this.o = (this.life / this.maxLife) * 0.35;
+      if (this.life <= 0 || this.y < -10) this.reset(false);
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Math.max(0.1, this.r), 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,215,0,' + this.o + ')';
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < MAX; i++) { const p = new P(); p.life = Math.random() * p.maxLife; particles.push(p); }
+
+  (function loop() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initBgCanvas();
+  // Auth state observer já cuida de tudo
+});
+</script>
+</body>
+</html>
