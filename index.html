@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg-deep:#060d07;--bg-primary:#0a1a0f;--bg-secondary:#0d2818;
@@ -23,14 +23,10 @@
 body{font-family:'Poppins',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 .font-cinzel{font-family:'Cinzel',serif}
 
-/* ===== CANVAS FUNDO ===== */
 #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-
-/* ===== TELAS ===== */
 .screen{display:none;position:relative;z-index:1;min-height:100vh}
 .screen.active{display:flex}
 
-/* ===== LOGIN ===== */
 #login-screen{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0d2818 0%,#060d07 70%);padding:20px}
 .login-card{background:linear-gradient(160deg,#132e1c,#0a1a0f);border:1px solid var(--border-gold);border-radius:24px;padding:2.5rem;width:100%;max-width:420px;box-shadow:0 0 80px rgba(255,215,0,0.04),0 30px 80px rgba(0,0,0,0.6);position:relative;overflow:hidden}
 .login-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,215,0,0.02),transparent,rgba(255,215,0,0.02),transparent);animation:rotBg 10s linear infinite}
@@ -52,12 +48,10 @@ body{font-family:'Poppins',sans-serif;background:var(--bg-deep);color:var(--text
 .tab-btn{flex:1;padding:12px;border:none;background:transparent;color:var(--text-secondary);font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;font-family:'Poppins',sans-serif;font-size:14px}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
 
-/* ===== HEADER JOGO ===== */
 .game-header{width:100%;padding:10px 16px;background:linear-gradient(180deg,rgba(10,26,15,.97),rgba(6,13,7,.95));border-bottom:1px solid var(--border-gold);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
 .balance-display{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.5);padding:8px 16px;border-radius:30px;border:1px solid var(--border-gold)}
 .balance-amount{color:var(--gold);font-weight:800;font-size:17px;min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
 
-/* ===== SLOT MACHINE ===== */
 .slot-container{margin:12px auto;position:relative;width:330px;max-width:92vw}
 .slot-frame{background:linear-gradient(160deg,#1a3d26,#0d1f14);border:2px solid var(--gold-dark);border-radius:20px;padding:18px 14px;box-shadow:0 0 50px rgba(255,215,0,0.06),inset 0 0 40px rgba(0,0,0,0.6);position:relative;overflow:hidden}
 .slot-frame::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -72,14 +66,12 @@ body{font-family:'Poppins',sans-serif;background:var(--bg-deep);color:var(--text
 .slot-cell.bounce .symbol-display{animation:symBounce .35s ease}
 @keyframes symBounce{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
 
-/* Linhas de pagamento */
 .payline{position:absolute;left:8px;right:8px;height:3px;border-radius:2px;opacity:0;transition:opacity .4s;pointer-events:none;z-index:5}
 .payline.show{opacity:.8}
 .payline-0{top:calc(16.67% - 1px);background:#ef4444}
 .payline-1{top:calc(50% - 1px);background:#22c55e}
 .payline-2{top:calc(83.33% - 1px);background:#3b82f6}
 
-/* ===== CONTROLES ===== */
 .controls-area{width:330px;max-width:92vw;margin:0 auto}
 .bet-controls{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.35);border-radius:16px;padding:12px 16px;border:1px solid var(--border-gold);margin-bottom:14px}
 .bet-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,215,0,0.08);border:1px solid var(--border-gold);color:var(--gold);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
@@ -95,7 +87,6 @@ body{font-family:'Poppins',sans-serif;background:var(--bg-deep);color:var(--text
 .spin-btn.spinning{animation:btnShine 1.2s ease infinite}
 @keyframes btnShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-/* ===== TABELA PAGAMENTO ===== */
 .paytable{background:rgba(0,0,0,0.3);border-radius:16px;border:1px solid var(--border-gold);padding:16px;margin-top:14px;width:330px;max-width:92vw}
 .paytable-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,215,0,0.04)}
 .paytable-row:last-child{border:none}
@@ -104,21 +95,18 @@ details summary::-webkit-details-marker{display:none}
 details summary::before{content:'\f078';font-family:'Font Awesome 6 Free';font-weight:900;font-size:10px;margin-right:8px;transition:transform .3s;display:inline-block}
 details[open] summary::before{transform:rotate(180deg)}
 
-/* ===== WIN OVERLAY ===== */
 .win-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)}
 .win-overlay.show{display:flex}
 .win-content{text-align:center;animation:winPop .5s cubic-bezier(.17,.67,.29,1.3)}
 @keyframes winPop{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 .win-amount{font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(255,215,0,0.5);font-family:'Cinzel',serif}
 
-/* ===== TOAST ===== */
 .toast-container{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{padding:12px 18px;border-radius:12px;background:var(--bg-card2);border:1px solid var(--border-gold);color:var(--text-primary);font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,0.5);animation:toastSlide .35s ease;max-width:300px;pointer-events:auto}
 .toast.error{border-color:rgba(220,38,38,.5);background:rgba(127,29,29,.4)}
 .toast.success{border-color:rgba(34,197,94,.4);background:rgba(20,83,45,.4)}
 @keyframes toastSlide{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ===== ADMIN ===== */
 #admin-screen{flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#0d2818 0%,#060d07 70%)}
 .admin-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:16px;padding:20px;margin-bottom:14px}
 .admin-input{padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.12);color:var(--text-primary);font-size:14px;outline:none;width:100%;transition:border-color .3s;font-family:'Poppins',sans-serif}
@@ -130,57 +118,60 @@ details[open] summary::before{transform:rotate(180deg)}
 .admin-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,0,0,0.3)}
 .admin-btn:active{transform:translateY(0)}
 
-.user-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(0,0,0,0.25);margin-bottom:8px;border:1px solid rgba(255,215,0,0.04);transition:border-color .3s}
+.user-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:rgba(0,0,0,0.25);margin-bottom:8px;border:1px solid rgba(255,215,0,0.04);transition:border-color .3s;flex-wrap:wrap}
 .user-row:hover{border-color:rgba(255,215,0,0.15)}
 
 input[type="range"]{-webkit-appearance:none;width:100%;height:5px;background:rgba(255,215,0,0.12);border-radius:3px;outline:none}
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 10px rgba(255,215,0,0.3)}
 
-/* ===== HISTÓRICO ===== */
 .history-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-bottom:4px;font-size:12px}
-
-/* ===== PARTÍCULAS VITÓRIA ===== */
 .win-particle{position:fixed;pointer-events:none;z-index:60;animation:pFly 1.4s ease-out forwards}
 @keyframes pFly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}100%{opacity:0;transform:translateY(-250px) scale(.2) rotate(360deg)}}
-
-/* ===== LOADING ===== */
 .spinner{width:22px;height:22px;border:3px solid rgba(255,215,0,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg-deep)}
-::-webkit-scrollbar-thumb{background:var(--gold-darker);border-radius:3px}
-
-/* ===== RESPONSIVO ===== */
-@media(max-width:380px){
-  .slot-cell{font-size:36px}
-  .slot-container,.controls-area,.paytable{width:100%}
-  .win-amount{font-size:38px}
-  .login-card{padding:1.5rem}
-}
-
-.fade-in{animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* Tigre brilho */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--gold-darker);border-radius:3px}
+@media(max-width:380px){.slot-cell{font-size:36px}.slot-container,.controls-area,.paytable{width:100%}.win-amount{font-size:38px}.login-card{padding:1.5rem}}
+.fade-in{animation:fadeUp .4s ease}@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .tiger-glow{filter:drop-shadow(0 0 12px rgba(255,215,0,0.3));animation:tigerBreath 3s ease infinite alternate}
 @keyframes tigerBreath{0%{filter:drop-shadow(0 0 8px rgba(255,215,0,0.2))}100%{filter:drop-shadow(0 0 20px rgba(255,215,0,0.45))}}
-
-/* Decoração cantos slot */
 .corner-deco{position:absolute;width:20px;height:20px;border-color:var(--gold-dark);z-index:2}
 .corner-deco.tl{top:6px;left:6px;border-top:2px solid;border-left:2px solid;border-radius:4px 0 0 0}
 .corner-deco.tr{top:6px;right:6px;border-top:2px solid;border-right:2px solid;border-radius:0 4px 0 0}
 .corner-deco.bl{bottom:6px;left:6px;border-bottom:2px solid;border-left:2px solid;border-radius:0 0 0 4px}
 .corner-deco.br{bottom:6px;right:6px;border-bottom:2px solid;border-right:2px solid;border-radius:0 0 4px 0}
-
-/* Stats card */
 .stat-card{text-align:center;padding:14px 10px;border-radius:12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,215,0,0.06)}
 .stat-card .stat-val{font-size:22px;font-weight:800;line-height:1.2}
 .stat-card .stat-label{font-size:11px;color:var(--text-muted);margin-top:4px}
-
 .header-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;border:none;background:transparent}
 .header-btn:hover{transform:scale(1.1)}
+
+/* ===== NOVO: MODAL CARTEIRA ===== */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);padding:20px}
+.modal-overlay.show{display:flex}
+.modal-card{background:linear-gradient(160deg,#132e1c,#0a1a0f);border:1px solid var(--border-gold);border-radius:20px;padding:24px;width:100%;max-width:400px;position:relative;animation:winPop .35s ease}
+.modal-close{position:absolute;top:12px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.15);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s}
+.modal-close:hover{color:var(--gold);border-color:var(--gold)}
+.wallet-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--text-secondary);font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;font-family:'Poppins',sans-serif;font-size:13px}
+.wallet-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.amount-chip{padding:10px 16px;border-radius:10px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);color:var(--text-primary);font-weight:600;cursor:pointer;transition:all .2s;text-align:center;font-size:14px}
+.amount-chip:hover,.amount-chip.selected{background:rgba(255,215,0,0.15);border-color:var(--gold);color:var(--gold)}
+
+/* ===== NOVO: WHATSAPP FLUTUANTE ===== */
+.whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:70;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:all .3s;animation:waPulse 2s ease infinite}
+.whatsapp-float:hover{transform:scale(1.1);box-shadow:0 6px 30px rgba(37,211,102,0.6)}
+.whatsapp-float i{color:#fff;font-size:28px}
+@keyframes waPulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4)}50%{box-shadow:0 4px 30px rgba(37,211,102,0.7)}}
+
+/* ===== NOVO: BOTAO SOM ===== */
+.sound-toggle{position:relative}
+.sound-toggle.muted i::after{content:'/';position:absolute;font-weight:900;color:#ef4444;font-size:18px;top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* ===== NOVO: SAQUES ADMIN ===== */
+.saque-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.25);margin-bottom:6px;border:1px solid rgba(255,215,0,0.04);font-size:12px;flex-wrap:wrap}
+.saque-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase}
+.saque-badge.pending{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
+.saque-badge.approved{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.saque-badge.rejected{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
 </style>
 </head>
 <body>
@@ -196,43 +187,22 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
       <h1 class="font-cinzel text-3xl font-black" style="color:var(--gold);letter-spacing:2px;">TIGER FORTUNE</h1>
       <p class="text-sm mt-2" style="color:var(--text-secondary);">Domine a selva, gire e ganhe</p>
     </div>
-
     <div class="flex mb-5" style="border-bottom:1px solid var(--border-gold);border-radius:8px 8px 0 0;overflow:hidden">
       <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Entrar</button>
       <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Cadastrar</button>
     </div>
-
     <form id="login-form" onsubmit="handleLogin(event)">
-      <div class="mb-4">
-        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label>
-        <input type="email" class="input-field" id="login-email" placeholder="seu@email.com" required>
-      </div>
-      <div class="mb-5">
-        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label>
-        <input type="password" class="input-field" id="login-password" placeholder="Minimo 6 caracteres" required minlength="6">
-      </div>
+      <div class="mb-4"><label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label><input type="email" class="input-field" id="login-email" placeholder="seu@email.com" required></div>
+      <div class="mb-5"><label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label><input type="password" class="input-field" id="login-password" placeholder="Minimo 6 caracteres" required minlength="6"></div>
       <button type="submit" class="btn-gold" id="login-btn"><i class="fas fa-sign-in-alt mr-2"></i>Entrar</button>
     </form>
-
     <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
-      <div class="mb-4">
-        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-user mr-1"></i>Nome</label>
-        <input type="text" class="input-field" id="reg-name" placeholder="Seu nome" required>
-      </div>
-      <div class="mb-4">
-        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label>
-        <input type="email" class="input-field" id="reg-email" placeholder="seu@email.com" required>
-      </div>
-      <div class="mb-5">
-        <label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label>
-        <input type="password" class="input-field" id="reg-password" placeholder="Minimo 6 caracteres" required minlength="6">
-      </div>
+      <div class="mb-4"><label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-user mr-1"></i>Nome</label><input type="text" class="input-field" id="reg-name" placeholder="Seu nome" required></div>
+      <div class="mb-4"><label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-envelope mr-1"></i>Email</label><input type="email" class="input-field" id="reg-email" placeholder="seu@email.com" required></div>
+      <div class="mb-5"><label class="block text-xs mb-2 font-semibold" style="color:var(--text-secondary);"><i class="fas fa-lock mr-1"></i>Senha</label><input type="password" class="input-field" id="reg-password" placeholder="Minimo 6 caracteres" required minlength="6"></div>
       <button type="submit" class="btn-gold" id="register-btn"><i class="fas fa-user-plus mr-2"></i>Criar Conta</button>
     </form>
-
-    <div id="login-status" class="text-center text-xs mt-4" style="color:var(--text-muted);">
-      <i class="fas fa-cloud mr-1"></i>Conectado ao Firebase
-    </div>
+    <div id="login-status" class="text-center text-xs mt-4" style="color:var(--text-muted);"><i class="fas fa-cloud mr-1"></i>Conectado ao Firebase</div>
   </div>
 </div>
 
@@ -243,158 +213,89 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
       <span style="font-size:22px;" class="tiger-glow">🐅</span>
       <span class="font-cinzel font-bold text-sm hidden sm:inline" style="color:var(--gold);">TIGER</span>
     </div>
-    <div class="balance-display">
+    <div class="balance-display" style="cursor:pointer;" onclick="openWallet()" title="Carteira">
       <i class="fas fa-coins text-sm" style="color:var(--gold);"></i>
       <span class="balance-amount" id="balance-display">0.00</span>
     </div>
     <div class="flex items-center gap-1">
-      <button id="admin-nav-btn" style="display:none;" onclick="showScreen('admin-screen')" class="header-btn" title="Painel Admin">
-        <i class="fas fa-cog text-sm" style="color:var(--gold);"></i>
-      </button>
-      <button onclick="handleLogout()" class="header-btn" title="Sair">
-        <i class="fas fa-sign-out-alt text-sm" style="color:#ef4444;"></i>
-      </button>
+      <!-- NOVO: Botao Carteira -->
+      <button onclick="openWallet()" class="header-btn" title="Carteira"><i class="fas fa-wallet text-sm" style="color:var(--gold);"></i></button>
+      <!-- NOVO: Botao Som -->
+      <button id="sound-btn" onclick="toggleSound()" class="header-btn sound-toggle" title="Som"><i class="fas fa-volume-up text-sm" style="color:var(--gold);"></i></button>
+      <button id="admin-nav-btn" style="display:none;" onclick="showScreen('admin-screen')" class="header-btn" title="Admin"><i class="fas fa-cog text-sm" style="color:var(--gold);"></i></button>
+      <button onclick="handleLogout()" class="header-btn" title="Sair"><i class="fas fa-sign-out-alt text-sm" style="color:#ef4444;"></i></button>
     </div>
   </header>
 
   <main class="flex-1 flex flex-col items-center py-3 px-4" style="gap:10px;width:100%;max-width:500px;">
-    <!-- Info aposta/ganho -->
     <div class="flex items-center justify-between w-full" style="max-width:330px;">
-      <div class="text-center">
-        <div class="text-[10px] font-semibold" style="color:var(--text-muted);">APOSTA</div>
-        <div class="font-extrabold" style="color:var(--gold);" id="current-bet-display">1.00</div>
-      </div>
-      <div id="win-indicator" style="opacity:0;transition:opacity .5s;">
-        <span class="font-cinzel font-bold text-sm" style="color:var(--green);" id="win-text">GANHOU!</span>
-      </div>
-      <div class="text-center">
-        <div class="text-[10px] font-semibold" style="color:var(--text-muted);">GANHO</div>
-        <div class="font-extrabold" style="color:var(--green);" id="last-win-display">0.00</div>
-      </div>
+      <div class="text-center"><div class="text-[10px] font-semibold" style="color:var(--text-muted);">APOSTA</div><div class="font-extrabold" style="color:var(--gold);" id="current-bet-display">1.00</div></div>
+      <div id="win-indicator" style="opacity:0;transition:opacity .5s;"><span class="font-cinzel font-bold text-sm" style="color:var(--green);" id="win-text">GANHOU!</span></div>
+      <div class="text-center"><div class="text-[10px] font-semibold" style="color:var(--text-muted);">GANHO</div><div class="font-extrabold" style="color:var(--green);" id="last-win-display">0.00</div></div>
     </div>
-
-    <!-- Slot Machine -->
-    <div class="slot-container">
-      <div class="slot-frame">
-        <div class="corner-deco tl"></div>
-        <div class="corner-deco tr"></div>
-        <div class="corner-deco bl"></div>
-        <div class="corner-deco br"></div>
-        <div class="slot-grid" id="slot-grid"></div>
-        <div class="payline payline-0" id="payline-0"></div>
-        <div class="payline payline-1" id="payline-1"></div>
-        <div class="payline payline-2" id="payline-2"></div>
-      </div>
-    </div>
-
-    <!-- Controles -->
+    <div class="slot-container"><div class="slot-frame"><div class="corner-deco tl"></div><div class="corner-deco tr"></div><div class="corner-deco bl"></div><div class="corner-deco br"></div><div class="slot-grid" id="slot-grid"></div><div class="payline payline-0" id="payline-0"></div><div class="payline payline-1" id="payline-1"></div><div class="payline payline-2" id="payline-2"></div></div></div>
     <div class="controls-area">
       <div class="bet-controls">
-        <button class="bet-btn" onclick="changeBet(-1)" aria-label="Diminuir aposta"><i class="fas fa-minus"></i></button>
-        <div class="flex-1 text-center">
-          <div class="text-[10px] font-semibold" style="color:var(--text-muted);">VALOR DA APOSTA</div>
-          <div class="font-extrabold text-lg" style="color:var(--gold);" id="bet-value">1.00</div>
-        </div>
-        <button class="bet-btn" onclick="changeBet(1)" aria-label="Aumentar aposta"><i class="fas fa-plus"></i></button>
+        <button class="bet-btn" onclick="changeBet(-1)"><i class="fas fa-minus"></i></button>
+        <div class="flex-1 text-center"><div class="text-[10px] font-semibold" style="color:var(--text-muted);">VALOR DA APOSTA</div><div class="font-extrabold text-lg" style="color:var(--gold);" id="bet-value">1.00</div></div>
+        <button class="bet-btn" onclick="changeBet(1)"><i class="fas fa-plus"></i></button>
       </div>
       <button class="spin-btn" id="spin-btn" onclick="handleSpin()"><i class="fas fa-play mr-2"></i>GIRAR</button>
     </div>
-
-    <!-- Paytable -->
-    <details class="paytable">
-      <summary class="font-cinzel font-bold text-sm" style="color:var(--gold);"><i class="fas fa-trophy mr-2"></i>Tabela de Pagamentos</summary>
-      <div id="paytable-content" class="mt-3"></div>
-    </details>
-
-    <!-- Histórico -->
-    <div class="paytable" style="max-height:180px;overflow-y:auto;">
-      <div class="font-cinzel font-bold text-sm mb-2" style="color:var(--gold);"><i class="fas fa-history mr-2"></i>Historico</div>
-      <div id="history-list"><p class="text-xs" style="color:var(--text-muted);">Nenhuma jogada ainda</p></div>
-    </div>
+    <details class="paytable"><summary class="font-cinzel font-bold text-sm" style="color:var(--gold);"><i class="fas fa-trophy mr-2"></i>Tabela de Pagamentos</summary><div id="paytable-content" class="mt-3"></div></details>
+    <div class="paytable" style="max-height:180px;overflow-y:auto;"><div class="font-cinzel font-bold text-sm mb-2" style="color:var(--gold);"><i class="fas fa-history mr-2"></i>Historico</div><div id="history-list"><p class="text-xs" style="color:var(--text-muted);">Nenhuma jogada ainda</p></div></div>
   </main>
 </div>
 
 <!-- ============ ADMIN ============ -->
 <div id="admin-screen" class="screen" style="flex-direction:column;">
   <header class="game-header">
-    <div class="flex items-center gap-3">
-      <button onclick="showScreen('game-screen')" class="header-btn" title="Voltar">
-        <i class="fas fa-arrow-left text-sm" style="color:var(--gold);"></i>
-      </button>
-      <span class="font-cinzel font-bold text-sm" style="color:var(--gold);">PAINEL ADMIN</span>
-    </div>
-    <div class="balance-display">
-      <i class="fas fa-coins text-sm" style="color:var(--gold);"></i>
-      <span class="balance-amount" id="admin-balance-display">0.00</span>
-    </div>
+    <div class="flex items-center gap-3"><button onclick="showScreen('game-screen')" class="header-btn"><i class="fas fa-arrow-left text-sm" style="color:var(--gold);"></i></button><span class="font-cinzel font-bold text-sm" style="color:var(--gold);">PAINEL ADMIN</span></div>
+    <div class="balance-display"><i class="fas fa-coins text-sm" style="color:var(--gold);"></i><span class="balance-amount" id="admin-balance-display">0.00</span></div>
   </header>
-
   <main class="flex-1 w-full max-w-2xl mx-auto p-4" style="padding-top:16px;">
     <!-- Probabilidades -->
     <div class="admin-card fade-in">
       <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-sliders-h mr-2"></i>Probabilidades</h2>
-
-      <div class="mb-5">
-        <div class="flex justify-between mb-2">
-          <label class="text-sm" style="color:var(--text-secondary);">Taxa de Vitoria</label>
-          <span class="font-bold text-sm" style="color:var(--gold);" id="win-rate-val">30%</span>
-        </div>
-        <input type="range" min="5" max="80" value="30" id="win-rate-slider" oninput="document.getElementById('win-rate-val').textContent=this.value+'%'">
-        <div class="flex justify-between text-[10px] mt-1" style="color:var(--text-muted);"><span>5% Dificil</span><span>80% Facil</span></div>
-      </div>
-
-      <div class="mb-5">
-        <div class="flex justify-between mb-2">
-          <label class="text-sm" style="color:var(--text-secondary);">Chance Big Win (3 Tigres)</label>
-          <span class="font-bold text-sm" style="color:var(--gold);" id="big-win-val">5%</span>
-        </div>
-        <input type="range" min="1" max="30" value="5" id="big-win-slider" oninput="document.getElementById('big-win-val').textContent=this.value+'%'">
-      </div>
-
+      <!-- ALTERADO: min="0" ao inves de min="5" -->
+      <div class="mb-5"><div class="flex justify-between mb-2"><label class="text-sm" style="color:var(--text-secondary);">Taxa de Vitoria</label><span class="font-bold text-sm" style="color:var(--gold);" id="win-rate-val">30%</span></div><input type="range" min="0" max="80" value="30" id="win-rate-slider" oninput="document.getElementById('win-rate-val').textContent=this.value+'%'"></div>
+      <div class="mb-5"><div class="flex justify-between mb-2"><label class="text-sm" style="color:var(--text-secondary);">Chance Big Win</label><span class="font-bold text-sm" style="color:var(--gold);" id="big-win-val">5%</span></div><input type="range" min="0" max="30" value="5" id="big-win-slider" oninput="document.getElementById('big-win-val').textContent=this.value+'%'"></div>
       <h3 class="font-bold text-xs mb-3 mt-4" style="color:var(--text-secondary);"><i class="fas fa-dice mr-1"></i>Frequencia dos Simbolos</h3>
       <div id="symbol-weights" class="grid grid-cols-2 gap-3 mb-5"></div>
-
       <button class="admin-btn admin-btn-primary w-full" onclick="saveConfig()"><i class="fas fa-save mr-2"></i>Salvar Configuracoes</button>
     </div>
-
-    <!-- Config gerais -->
+    <!-- Config Gerais -->
     <div class="admin-card fade-in">
-      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-cog mr-2"></i>Configuracoes Gerais</h2>
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-cog mr-2"></i>Config Gerais</h2>
       <div class="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Creditos Iniciais</label>
-          <input type="number" class="admin-input" id="initial-credits" value="100" min="0" step="10">
-        </div>
-        <div>
-          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Minima</label>
-          <input type="number" class="admin-input" id="min-bet" value="1" min="0.5" step="0.5">
-        </div>
-        <div>
-          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Maxima</label>
-          <input type="number" class="admin-input" id="max-bet" value="100" min="10" step="10">
-        </div>
-        <div>
-          <label class="text-xs block mb-1" style="color:var(--text-secondary);">Multiplicador Tigre</label>
-          <input type="number" class="admin-input" id="tiger-mult" value="50" min="5" step="5">
-        </div>
+        <div><label class="text-xs block mb-1" style="color:var(--text-secondary);">Creditos Iniciais</label><input type="number" class="admin-input" id="initial-credits" value="100" min="0" step="10"></div>
+        <div><label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Minima</label><input type="number" class="admin-input" id="min-bet" value="1" min="0.5" step="0.5"></div>
+        <div><label class="text-xs block mb-1" style="color:var(--text-secondary);">Aposta Maxima</label><input type="number" class="admin-input" id="max-bet" value="100" min="10" step="10"></div>
+        <div><label class="text-xs block mb-1" style="color:var(--text-secondary);">Multiplicador Tigre</label><input type="number" class="admin-input" id="tiger-mult" value="50" min="5" step="5"></div>
       </div>
+      <!-- NOVO: Link de pagamento e WhatsApp -->
+      <div class="mb-3"><label class="text-xs block mb-1" style="color:var(--text-secondary);"><i class="fas fa-link mr-1"></i>Link de Pagamento (Deposito)</label><input type="url" class="admin-input" id="payment-link" placeholder="https://seulinkdepagamento.com"></div>
+      <div class="mb-3"><label class="text-xs block mb-1" style="color:var(--text-secondary);"><i class="fab fa-whatsapp mr-1"></i>WhatsApp (somente numeros com codigo pais)</label><input type="text" class="admin-input" id="whatsapp-number" placeholder="5511999999999"></div>
+      <div class="mb-3"><label class="text-xs block mb-1" style="color:var(--text-secondary);"><i class="fas fa-percent mr-1"></i>Taxa de Saque (%)</label><input type="number" class="admin-input" id="withdrawal-fee" value="0" min="0" max="50" step="1"></div>
+      <div class="mb-3"><label class="text-xs block mb-1" style="color:var(--text-secondary);"><i class="fas fa-arrow-down mr-1"></i>Saque Minimo</label><input type="number" class="admin-input" id="min-withdrawal" value="20" min="1" step="5"></div>
       <button class="admin-btn admin-btn-primary w-full" onclick="saveGeneralConfig()"><i class="fas fa-save mr-2"></i>Salvar</button>
     </div>
-
     <!-- Usuarios -->
     <div class="admin-card fade-in">
       <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-users mr-2"></i>Gerenciar Usuarios</h2>
       <div class="flex gap-2 mb-4">
         <input type="email" class="admin-input flex-1" id="admin-user-email" placeholder="Email do usuario">
         <input type="number" class="admin-input" id="admin-credit-amount" placeholder="Qtd" style="width:90px;" value="100">
-        <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="adminAddCredits()" title="Adicionar creditos"><i class="fas fa-plus"></i></button>
+        <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="adminAddCredits()"><i class="fas fa-plus"></i></button>
       </div>
-      <div id="users-list">
-        <div class="text-center py-4"><div class="spinner"></div><p class="text-xs mt-2" style="color:var(--text-muted);">Carregando...</p></div>
-      </div>
+      <div id="users-list"><div class="text-center py-4"><div class="spinner"></div></div></div>
     </div>
-
-    <!-- Estatísticas -->
+    <!-- NOVO: Solicitacoes de Saque -->
+    <div class="admin-card fade-in">
+      <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-hand-holding-usd mr-2"></i>Solicitacoes de Saque</h2>
+      <div id="withdrawals-list"><div class="text-center py-4"><div class="spinner"></div></div></div>
+    </div>
+    <!-- Estatisticas -->
     <div class="admin-card fade-in">
       <h2 class="font-cinzel font-bold text-base mb-4" style="color:var(--gold);"><i class="fas fa-chart-bar mr-2"></i>Estatisticas</h2>
       <div class="grid grid-cols-2 gap-3">
@@ -404,7 +305,6 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
         <div class="stat-card"><div class="stat-val" style="color:#22c55e;" id="stat-players">0</div><div class="stat-label">Jogadores Ganhou</div></div>
       </div>
     </div>
-
     <div style="height:30px;"></div>
   </main>
 </div>
@@ -418,6 +318,75 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
     <p class="text-xs mt-3" style="color:var(--text-muted);">Toque para continuar</p>
   </div>
 </div>
+
+<!-- NOVO: Modal Carteira (Deposito / Saque) -->
+<div class="modal-overlay" id="wallet-modal">
+  <div class="modal-card">
+    <div class="modal-close" onclick="closeWallet()"><i class="fas fa-times"></i></div>
+    <h2 class="font-cinzel font-bold text-lg mb-1 text-center" style="color:var(--gold);"><i class="fas fa-wallet mr-2"></i>Carteira</h2>
+    <p class="text-center text-xs mb-4" style="color:var(--text-muted);">Saldo: <span id="wallet-balance" style="color:var(--gold);font-weight:700;">0.00</span></p>
+
+    <div class="flex mb-4" style="border-bottom:1px solid var(--border-gold);border-radius:8px 8px 0 0;overflow:hidden">
+      <button class="wallet-tab active" id="wtab-deposit" onclick="switchWalletTab('deposit')"><i class="fas fa-arrow-down mr-1"></i>Depositar</button>
+      <button class="wallet-tab" id="wtab-withdraw" onclick="switchWalletTab('withdraw')"><i class="fas fa-arrow-up mr-1"></i>Sacar</button>
+    </div>
+
+    <!-- Depositar -->
+    <div id="wallet-deposit">
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="amount-chip" onclick="selectDepositAmount(10)">R$ 10</div>
+        <div class="amount-chip" onclick="selectDepositAmount(25)">R$ 25</div>
+        <div class="amount-chip" onclick="selectDepositAmount(50)">R$ 50</div>
+        <div class="amount-chip" onclick="selectDepositAmount(100)">R$ 100</div>
+        <div class="amount-chip" onclick="selectDepositAmount(200)">R$ 200</div>
+        <div class="amount-chip" onclick="selectDepositAmount(500)">R$ 500</div>
+      </div>
+      <div class="mb-4">
+        <label class="text-xs block mb-1" style="color:var(--text-secondary);">Ou digite o valor:</label>
+        <input type="number" class="input-field" id="deposit-custom-amount" placeholder="Valor personalizado" min="1" step="1">
+      </div>
+      <button class="btn-gold" id="deposit-pay-btn" onclick="handleDeposit()">
+        <i class="fas fa-credit-card mr-2"></i>Pagar Agora
+      </button>
+      <p class="text-center text-[10px] mt-3" style="color:var(--text-muted);">Apos o pagamento, o admin creditara seu saldo</p>
+    </div>
+
+    <!-- Sacar -->
+    <div id="wallet-withdraw" style="display:none;">
+      <div class="mb-3">
+        <label class="text-xs block mb-1" style="color:var(--text-secondary);">Valor do Saque</label>
+        <input type="number" class="input-field" id="withdraw-amount" placeholder="Quanto deseja sacar" min="1" step="1">
+      </div>
+      <div class="mb-3">
+        <label class="text-xs block mb-1" style="color:var(--text-secondary);">Chave PIX</label>
+        <input type="text" class="input-field" id="withdraw-pix-key" placeholder="CPF, telefone, email ou chave aleatoria">
+      </div>
+      <div class="mb-3">
+        <label class="text-xs block mb-1" style="color:var(--text-secondary);">Tipo da Chave</label>
+        <select class="input-field" id="withdraw-pix-type">
+          <option value="cpf">CPF</option>
+          <option value="telefone">Telefone</option>
+          <option value="email">Email</option>
+          <option value="aleatoria">Chave Aleatoria</option>
+        </select>
+      </div>
+      <div class="p-3 rounded-lg mb-4" style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.1);">
+        <div class="flex justify-between text-xs"><span style="color:var(--text-muted);">Saque minimo:</span><span id="withdraw-min-info" style="color:var(--gold);">R$ 20.00</span></div>
+        <div class="flex justify-between text-xs mt-1"><span style="color:var(--text-muted);">Taxa de saque:</span><span id="withdraw-fee-info" style="color:var(--gold);">0%</span></div>
+        <div class="flex justify-between text-xs mt-1"><span style="color:var(--text-muted);">Voce recebe:</span><span id="withdraw-receive-info" style="color:#22c55e;">R$ 0.00</span></div>
+      </div>
+      <button class="btn-gold" onclick="handleWithdraw()">
+        <i class="fas fa-paper-plane mr-2"></i>Solicitar Saque
+      </button>
+      <p class="text-center text-[10px] mt-3" style="color:var(--text-muted);">Saques sao processados pelo admin em ate 24h</p>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Botao WhatsApp Flutuante -->
+<a id="whatsapp-float-btn" class="whatsapp-float" href="https://wa.me/5511999999999" target="_blank" title="Fale conosco no WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
 
 <script>
 /* ================================================================
@@ -436,7 +405,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db = firebase.database();
 
 /* ================================================================
    SÍMBOLOS DO JOGO
@@ -450,40 +419,269 @@ let SYMBOLS = [
   { id:'bamboo',  emoji:'🎋', name:'Bambu',     multiplier:3,  color:'#34D399', defaultWeight:25 },
 ];
 
-const PAYLINES = [
-  [0,1,2], // topo
-  [3,4,5], // centro
-  [6,7,8], // baixo
-];
+const PAYLINES = [[0,1,2],[3,4,5],[6,7,8]];
 
 /* ================================================================
    ESTADO GLOBAL
    ================================================================ */
 const S = {
-  user: null,
-  uid: null,
-  userData: null,
-  spinning: false,
-  bet: 1,
-  balance: 100,
-  history: [],
+  user: null, uid: null, userData: null,
+  spinning: false, bet: 1, balance: 100, history: [],
   config: {
-    winRate: 30,
-    bigWinRate: 5,
-    initialCredits: 100,
-    minBet: 1,
-    maxBet: 100,
-    tigerMultiplier: 50,
-    symbolWeights: null, // preenchido com defaultWeight
+    winRate: 30, bigWinRate: 5, initialCredits: 100,
+    minBet: 1, maxBet: 100, tigerMultiplier: 50,
+    symbolWeights: null,
+    paymentLink: '', whatsappNumber: '5511999999999',
+    withdrawalFee: 0, minWithdrawal: 20
   },
-  stats: { totalSpins:0, houseWon:0, playersWon:0 },
-  unsubUsers: null,
+  stats: { totalSpins:0, houseWon:0, playersWon:0 }
 };
 
-// Inicializar pesos padrão
 if (!S.config.symbolWeights) {
   S.config.symbolWeights = {};
   SYMBOLS.forEach(s => S.config.symbolWeights[s.id] = s.defaultWeight);
+}
+
+/* ================================================================
+   NOVO: SISTEMA DE SOM (Web Audio API)
+   ================================================================ */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let soundEnabled = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('sound-btn');
+  const icon = btn.querySelector('i');
+  if (soundEnabled) {
+    icon.className = 'fas fa-volume-up text-sm';
+    icon.style.color = 'var(--gold)';
+    btn.classList.remove('muted');
+  } else {
+    icon.className = 'fas fa-volume-mute text-sm';
+    icon.style.color = '#ef4444';
+    btn.classList.add('muted');
+  }
+  if (soundEnabled) playClick();
+}
+
+function playClick() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 800; o.type = 'sine';
+    g.gain.setValueAtTime(0.06, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.06);
+  } catch(e){}
+}
+
+function playSpinStart() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(200, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15);
+    o.type = 'sawtooth';
+    g.gain.setValueAtTime(0.04, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.2);
+  } catch(e){}
+}
+
+function playReelStop() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 120; o.type = 'triangle';
+    g.gain.setValueAtTime(0.08, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.1);
+    // Click
+    const o2 = ctx.createOscillator(); const g2 = ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.frequency.value = 400; o2.type = 'square';
+    g2.gain.setValueAtTime(0.03, ctx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+    o2.start(ctx.currentTime); o2.stop(ctx.currentTime + 0.03);
+  } catch(e){}
+}
+
+function playWinSound() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const notes = [523, 659, 784, 880];
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'sine';
+      g.gain.setValueAtTime(0.08, ctx.currentTime + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25);
+      o.start(ctx.currentTime + i * 0.12); o.stop(ctx.currentTime + i * 0.12 + 0.25);
+    });
+  } catch(e){}
+}
+
+function playBigWinSound() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const notes = [523, 659, 784, 1047, 1319, 1568];
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = 'sine';
+      g.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.4);
+      o.start(ctx.currentTime + i * 0.1); o.stop(ctx.currentTime + i * 0.1 + 0.4);
+    });
+    // Arpeggio extra
+    setTimeout(() => {
+      if (!soundEnabled) return;
+      [1047, 1568, 2093].forEach((freq, i) => {
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.value = freq; o.type = 'sine';
+        g.gain.setValueAtTime(0.06, audioCtx.currentTime + i * 0.08);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
+        o.start(audioCtx.currentTime + i * 0.08); o.stop(audioCtx.currentTime + i * 0.08 + 0.3);
+      });
+    }, 600);
+  } catch(e){}
+}
+
+function playLoseSound() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(250, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
+    o.type = 'triangle';
+    g.gain.setValueAtTime(0.04, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3);
+  } catch(e){}
+}
+
+/* ================================================================
+   NOVO: CARTEIRA (DEPÓSITO / SAQUE)
+   ================================================================ */
+let selectedDepositAmount = 0;
+
+function openWallet() {
+  playClick();
+  document.getElementById('wallet-balance').textContent = S.balance.toFixed(2);
+  document.getElementById('wallet-modal').classList.add('show');
+  document.getElementById('withdraw-min-info').textContent = 'R$ ' + (S.config.minWithdrawal || 20).toFixed(2);
+  document.getElementById('withdraw-fee-info').textContent = (S.config.withdrawalFee || 0) + '%';
+  updateWithdrawReceive();
+  switchWalletTab('deposit');
+}
+
+function closeWallet() { document.getElementById('wallet-modal').classList.remove('show'); }
+
+function switchWalletTab(tab) {
+  playClick();
+  document.getElementById('wtab-deposit').classList.toggle('active', tab === 'deposit');
+  document.getElementById('wtab-withdraw').classList.toggle('active', tab === 'withdraw');
+  document.getElementById('wallet-deposit').style.display = tab === 'deposit' ? 'block' : 'none';
+  document.getElementById('wallet-withdraw').style.display = tab === 'withdraw' ? 'block' : 'none';
+}
+
+function selectDepositAmount(val) {
+  playClick();
+  selectedDepositAmount = val;
+  document.getElementById('deposit-custom-amount').value = val;
+  document.querySelectorAll('.amount-chip').forEach(c => c.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+function handleDeposit() {
+  playClick();
+  const customVal = parseFloat(document.getElementById('deposit-custom-amount').value);
+  const amount = customVal || selectedDepositAmount;
+  if (!amount || amount <= 0) { showToast('Selecione ou digite um valor', 'error'); return; }
+
+  const link = S.config.paymentLink;
+  if (!link) { showToast('Link de pagamento nao configurado pelo admin', 'error'); return; }
+
+  // Abrir link de pagamento em nova aba
+  const separator = link.includes('?') ? '&' : '?';
+  window.open(link + separator + 'valor=' + amount + '&email=' + encodeURIComponent(S.user.email), '_blank');
+  showToast('Pagamento aberto em nova aba! Apos confirmar, o admin creditara seu saldo.', 'success');
+}
+
+function updateWithdrawReceive() {
+  const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+  const fee = S.config.withdrawalFee || 0;
+  const receive = amount - (amount * fee / 100);
+  document.getElementById('withdraw-receive-info').textContent = 'R$ ' + Math.max(0, receive).toFixed(2);
+}
+
+// Atualizar valor recebido ao digitar
+document.addEventListener('DOMContentLoaded', () => {
+  const wInput = document.getElementById('withdraw-amount');
+  if (wInput) wInput.addEventListener('input', updateWithdrawReceive);
+});
+
+async function handleWithdraw() {
+  playClick();
+  const amount = parseFloat(document.getElementById('withdraw-amount').value);
+  const pixKey = document.getElementById('withdraw-pix-key').value.trim();
+  const pixType = document.getElementById('withdraw-pix-type').value;
+
+  if (!amount || amount <= 0) { showToast('Digite o valor do saque', 'error'); return; }
+  const minW = S.config.minWithdrawal || 20;
+  if (amount < minW) { showToast('Saque minimo e R$ ' + minW.toFixed(2), 'error'); return; }
+  if (amount > S.balance) { showToast('Saldo insuficiente', 'error'); return; }
+  if (!pixKey) { showToast('Digite sua chave PIX', 'error'); return; }
+
+  try {
+    const fee = S.config.withdrawalFee || 0;
+    const receive = amount - (amount * fee / 100);
+    // Deduzir do saldo
+    S.balance = Math.round((S.balance - amount) * 100) / 100;
+    await db.ref('tigrinho/jogadores/' + S.uid).update({ credits: S.balance });
+    updateBalance();
+
+    // Salvar solicitacao de saque
+    const saqueRef = db.ref('tigrinho/saques').push();
+    await saqueRef.set({
+      uid: S.uid,
+      name: S.userData.name || S.userData.email,
+      email: S.userData.email,
+      amount: amount,
+      fee: fee,
+      receiveAmount: Math.round(receive * 100) / 100,
+      pixKey: pixKey,
+      pixType: pixType,
+      status: 'pending',
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+
+    document.getElementById('withdraw-amount').value = '';
+    document.getElementById('withdraw-pix-key').value = '';
+    document.getElementById('wallet-balance').textContent = S.balance.toFixed(2);
+    showToast('Saque de R$ ' + amount.toFixed(2) + ' solicitado! Aguarde a aprovacao.', 'success');
+    closeWallet();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
 }
 
 /* ================================================================
@@ -493,16 +691,9 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-    S.user = user;
-    S.uid = user.uid;
-    await loadUserData();
-    await loadGameConfig();
-    enterGame();
-  } else {
-    S.user = null;
-    S.uid = null;
-    showScreen('login-screen');
-  }
+    S.user = user; S.uid = user.uid;
+    await loadUserData(); await loadGameConfig(); enterGame();
+  } else { S.user = null; S.uid = null; showScreen('login-screen'); }
 });
 
 async function handleLogin(e) {
@@ -510,15 +701,10 @@ async function handleLogin(e) {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-password').value;
   const btn = document.getElementById('login-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch(err) {
-    showToast(translateError(err.code), 'error');
-  }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Entrar';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try { await auth.signInWithEmailAndPassword(email, pass); }
+  catch(err) { showToast(translateError(err.code), 'error'); }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Entrar';
 }
 
 async function handleRegister(e) {
@@ -527,40 +713,28 @@ async function handleRegister(e) {
   const email = document.getElementById('reg-email').value.trim();
   const pass = document.getElementById('reg-password').value;
   const btn = document.getElementById('register-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    // Verificar se é o primeiro usuário
-    const usersSnap = await db.collection('tiger_users').limit(1).get();
-    const isAdmin = usersSnap.empty;
-    await db.collection('tiger_users').doc(cred.user.uid).set({
+    const snap = await db.ref('tigrinho/jogadores').limitToFirst(1).once('value');
+    const isAdmin = !snap.exists();
+    await db.ref('tigrinho/jogadores/' + cred.user.uid).set({
       name, email, credits: S.config.initialCredits,
-      isAdmin, totalSpins: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      isAdmin, totalSpins: 0, createdAt: firebase.database.ServerValue.TIMESTAMP
     });
     showToast('Conta criada com sucesso!', 'success');
-  } catch(err) {
-    showToast(translateError(err.code), 'error');
-  }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Criar Conta';
+  } catch(err) { showToast(translateError(err.code), 'error'); }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Criar Conta';
 }
 
-function handleLogout() {
-  if (S.unsubUsers) { S.unsubUsers(); S.unsubUsers = null; }
-  auth.signOut();
-}
+function handleLogout() { auth.signOut(); }
 
 function translateError(code) {
   const map = {
-    'auth/user-not-found':'Usuario nao encontrado',
-    'auth/wrong-password':'Senha incorreta',
-    'auth/email-already-in-use':'Email ja cadastrado',
-    'auth/weak-password':'Senha muito fraca (minimo 6 caracteres)',
-    'auth/invalid-email':'Email invalido',
-    'auth/invalid-credential':'Email ou senha incorretos',
-    'auth/too-many-requests':'Muitas tentativas. Tente novamente mais tarde',
+    'auth/user-not-found':'Usuario nao encontrado','auth/wrong-password':'Senha incorreta',
+    'auth/email-already-in-use':'Email ja cadastrado','auth/weak-password':'Senha muito fraca (minimo 6 caracteres)',
+    'auth/invalid-email':'Email invalido','auth/invalid-credential':'Email ou senha incorretos',
+    'auth/too-many-requests':'Muitas tentativas. Aguarde um momento',
   };
   return map[code] || 'Erro: ' + code;
 }
@@ -570,38 +744,27 @@ function translateError(code) {
    ================================================================ */
 async function loadUserData() {
   try {
-    const doc = await db.collection('tiger_users').doc(S.uid).get();
-    if (doc.exists) {
-      S.userData = doc.data();
-      S.balance = S.userData.credits || 0;
-    } else {
-      // Criar documento se não existe
+    const snap = await db.ref('tigrinho/jogadores/' + S.uid).once('value');
+    if (snap.exists()) { S.userData = snap.val(); S.balance = S.userData.credits || 0; }
+    else {
       S.userData = { name: S.user.displayName || S.user.email, email: S.user.email, credits: S.config.initialCredits, isAdmin: false, totalSpins: 0 };
       S.balance = S.config.initialCredits;
-      await db.collection('tiger_users').doc(S.uid).set(S.userData);
+      await db.ref('tigrinho/jogadores/' + S.uid).set(S.userData);
     }
-  } catch(e) {
-    console.error('Erro ao carregar dados:', e);
-    S.userData = { name: S.user.email, credits: 100, isAdmin: false };
-    S.balance = 100;
-  }
+  } catch(e) { console.error(e); S.userData = { name: S.user.email, credits: 100, isAdmin: false }; S.balance = 100; }
 }
 
 async function loadGameConfig() {
   try {
-    const doc = await db.collection('tiger_config').doc('game').get();
-    if (doc.exists) {
-      const data = doc.data();
-      S.config = { ...S.config, ...data };
-      // Atualizar multiplicador do tigre
-      if (data.tigerMultiplier) SYMBOLS[0].multiplier = data.tigerMultiplier;
-    }
-  } catch(e) { console.error('Erro config:', e); }
-
-  try {
-    const doc = await db.collection('tiger_config').doc('stats').get();
-    if (doc.exists) S.stats = { ...S.stats, ...doc.data() };
+    const snap = await db.ref('tigrinho/config').once('value');
+    if (snap.exists()) { S.config = { ...S.config, ...snap.val() }; if (S.config.tigerMultiplier) SYMBOLS[0].multiplier = S.config.tigerMultiplier; }
   } catch(e) {}
+  try {
+    const snap = await db.ref('tigrinho/stats').once('value');
+    if (snap.exists()) S.stats = { ...S.stats, ...snap.val() };
+  } catch(e) {}
+  // NOVO: Atualizar link WhatsApp
+  updateWhatsAppLink();
 }
 
 /* ================================================================
@@ -609,9 +772,7 @@ async function loadGameConfig() {
    ================================================================ */
 function enterGame() {
   document.getElementById('admin-nav-btn').style.display = S.userData.isAdmin ? 'flex' : 'none';
-  updateBalance();
-  buildSlotGrid();
-  buildPaytable();
+  updateBalance(); buildSlotGrid(); buildPaytable();
   showScreen('game-screen');
   showToast('Bem-vindo, ' + (S.userData.name || S.userData.email) + '!', 'success');
 }
@@ -650,53 +811,45 @@ function updateBalance() {
 }
 
 /* ================================================================
-   SLOT GRID
+   NOVO: ATUALIZAR LINK WHATSAPP
+   ================================================================ */
+function updateWhatsAppLink() {
+  const num = S.config.whatsappNumber || '5511999999999';
+  document.getElementById('whatsapp-float-btn').href = 'https://wa.me/' + num;
+}
+
+/* ================================================================
+   SLOT GRID & PAYTABLE
    ================================================================ */
 function buildSlotGrid() {
   const grid = document.getElementById('slot-grid');
   grid.innerHTML = '';
   for (let i = 0; i < 9; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'slot-cell';
-    cell.id = 'cell-' + i;
-    const sym = document.createElement('span');
-    sym.className = 'symbol-display';
+    const cell = document.createElement('div'); cell.className = 'slot-cell'; cell.id = 'cell-' + i;
+    const sym = document.createElement('span'); sym.className = 'symbol-display';
     sym.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
-    cell.appendChild(sym);
-    grid.appendChild(cell);
+    cell.appendChild(sym); grid.appendChild(cell);
   }
 }
 
 function buildPaytable() {
-  const c = document.getElementById('paytable-content');
-  c.innerHTML = '';
+  const c = document.getElementById('paytable-content'); c.innerHTML = '';
   SYMBOLS.forEach(s => {
-    const row = document.createElement('div');
-    row.className = 'paytable-row';
-    row.innerHTML = `
-      <div class="flex items-center gap-1">
-        <span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span>
-        <span class="ml-2 text-xs" style="color:var(--text-secondary);">${s.name}</span>
-      </div>
-      <span class="font-bold text-sm" style="color:${s.color};">${s.multiplier}x</span>`;
+    const row = document.createElement('div'); row.className = 'paytable-row';
+    row.innerHTML = `<div class="flex items-center gap-1"><span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span><span style="font-size:24px;">${s.emoji}</span><span class="ml-2 text-xs" style="color:var(--text-secondary);">${s.name}</span></div><span class="font-bold text-sm" style="color:${s.color};">${s.multiplier}x</span>`;
     c.appendChild(row);
   });
-  const wild = document.createElement('div');
-  wild.className = 'paytable-row';
-  wild.innerHTML = '<div class="flex items-center gap-1"><span style="font-size:18px;">🐅</span><span class="text-xs ml-2" style="color:var(--text-secondary);">Tigre = Wild (substitui todos)</span></div><span class="font-bold text-xs" style="color:var(--gold);">WILD</span>';
-  c.appendChild(wild);
 }
 
 /* ================================================================
    LÓGICA DO JOGO
    ================================================================ */
 function changeBet(dir) {
-  const min = S.config.minBet;
-  const max = Math.min(S.config.maxBet, S.balance);
+  playClick();
+  const min = S.config.minBet; const max = Math.min(S.config.maxBet, S.balance);
   let step = S.bet >= 50 ? 10 : S.bet >= 20 ? 5 : S.bet >= 10 ? 2 : 0.5;
   S.bet = Math.max(min, Math.min(max, S.bet + dir * step));
-  S.bet = Math.round(S.bet * 100) / 100;
-  updateBalance();
+  S.bet = Math.round(S.bet * 100) / 100; updateBalance();
 }
 
 function weightedRandom() {
@@ -716,82 +869,38 @@ function generateResult() {
   const grid = Array(9).fill(null);
 
   if (willBigWin) {
-    // 3 tigres na linha central
-    const t = SYMBOLS[0];
-    grid[3] = t; grid[4] = t; grid[5] = t;
+    const t = SYMBOLS[0]; grid[3] = t; grid[4] = t; grid[5] = t;
     for (let i = 0; i < 9; i++) if (!grid[i]) grid[i] = weightedRandom();
-    breakLine(grid, 0); breakLine(grid, 2);
-    return grid;
+    breakLine(grid, 0); breakLine(grid, 2); return grid;
   }
-
   if (willWin) {
     const li = Math.floor(Math.random() * PAYLINES.length);
     const line = PAYLINES[li];
     const winSym = Math.random() < 0.08 ? SYMBOLS[0] : SYMBOLS[1 + Math.floor(Math.random() * (SYMBOLS.length - 1))];
     line.forEach(idx => { grid[idx] = winSym; });
     for (let i = 0; i < 9; i++) if (!grid[i]) grid[i] = weightedRandom();
-    PAYLINES.forEach((pl, i) => { if (i !== li) breakLine(grid, i); });
-    return grid;
+    PAYLINES.forEach((pl, i) => { if (i !== li) breakLine(grid, i); }); return grid;
   }
-
-  // Sem vitória
   for (let i = 0; i < 9; i++) grid[i] = weightedRandom();
-  PAYLINES.forEach((_, i) => breakLine(grid, i));
-  return grid;
+  PAYLINES.forEach((_, i) => breakLine(grid, i)); return grid;
 }
 
 function breakLine(grid, paylineIdx) {
-  const line = PAYLINES[paylineIdx];
-  const ids = line.map(i => grid[i].id);
-  // 3 iguais
-  if (ids[0] === ids[1] && ids[1] === ids[2]) {
-    const avail = SYMBOLS.filter(s => s.id !== ids[0]);
-    grid[line[2]] = avail[Math.floor(Math.random() * avail.length)];
-  }
-  // Wild check: 2+ tigres + outro símbolo = vitória
+  const line = PAYLINES[paylineIdx]; const ids = line.map(i => grid[i].id);
+  if (ids[0] === ids[1] && ids[1] === ids[2]) { const avail = SYMBOLS.filter(s => s.id !== ids[0]); grid[line[2]] = avail[Math.floor(Math.random() * avail.length)]; }
   const tigerCt = ids.filter(id => id === 'tiger').length;
-  if (tigerCt >= 2) {
-    const nonTiger = line.filter(i => grid[i].id !== 'tiger');
-    if (nonTiger.length > 0 && nonTiger.length < 3) {
-      // Verificar se os não-tigre são iguais
-      const nonIds = nonTiger.map(i => grid[i].id);
-      if (nonIds.every(id => id === nonIds[0])) {
-        const avail = SYMBOLS.filter(s => s.id !== 'tiger' && s.id !== nonIds[0]);
-        if (avail.length > 0) grid[nonTiger[0]] = avail[Math.floor(Math.random() * avail.length)];
-      }
-    }
-  }
-  // 2 iguais + 1 wild (tigre) = vitória com wild
-  if (tigerCt === 1) {
-    const nonTigerIds = ids.filter(id => id !== 'tiger');
-    if (nonTigerIds[0] === nonTigerIds[1]) {
-      const avail = SYMBOLS.filter(s => s.id !== nonTigerIds[0] && s.id !== 'tiger');
-      if (avail.length > 0) {
-        const tigerIdx = line.findIndex(i => grid[i].id === 'tiger');
-        grid[line[tigerIdx]] = avail[Math.floor(Math.random() * avail.length)];
-      }
-    }
-  }
+  if (tigerCt >= 2) { const nonTiger = line.filter(i => grid[i].id !== 'tiger'); if (nonTiger.length > 0 && nonTiger.length < 3) { const nonIds = nonTiger.map(i => grid[i].id); if (nonIds.every(id => id === nonIds[0])) { const avail = SYMBOLS.filter(s => s.id !== 'tiger' && s.id !== nonIds[0]); if (avail.length > 0) grid[nonTiger[0]] = avail[Math.floor(Math.random() * avail.length)]; } } }
+  if (tigerCt === 1) { const nonTigerIds = ids.filter(id => id !== 'tiger'); if (nonTigerIds[0] === nonTigerIds[1]) { const avail = SYMBOLS.filter(s => s.id !== nonTigerIds[0] && s.id !== 'tiger'); if (avail.length > 0) { const tigerIdx = line.findIndex(i => grid[i].id === 'tiger'); grid[line[tigerIdx]] = avail[Math.floor(Math.random() * avail.length)]; } } }
 }
 
 function calculateWins(grid) {
   const wins = [];
   PAYLINES.forEach((line, idx) => {
-    const cells = line.map(i => grid[i]);
-    const ids = cells.map(c => c.id);
-    // 3 iguais
-    if (ids[0] === ids[1] && ids[1] === ids[2]) {
-      wins.push({ lineIdx: idx, symbol: cells[0], cells: line });
-      return;
-    }
-    // Com wild
-    const nonWild = ids.filter(id => id !== 'tiger');
-    const tigers = ids.filter(id => id === 'tiger').length;
-    if (tigers > 0 && nonWild.length > 0 && nonWild.every(id => id === nonWild[0])) {
-      wins.push({ lineIdx: idx, symbol: SYMBOLS.find(s => s.id === nonWild[0]), cells: line, hasWild: true });
-    }
-  });
-  return wins;
+    const cells = line.map(i => grid[i]); const ids = cells.map(c => c.id);
+    if (ids[0] === ids[1] && ids[1] === ids[2]) { wins.push({ lineIdx: idx, symbol: cells[0], cells: line }); return; }
+    const nonWild = ids.filter(id => id !== 'tiger'); const tigers = ids.filter(id => id === 'tiger').length;
+    if (tigers > 0 && nonWild.length > 0 && nonWild.every(id => id === nonWild[0])) { wins.push({ lineIdx: idx, symbol: SYMBOLS.find(s => s.id === nonWild[0]), cells: line, hasWild: true }); }
+  }); return wins;
 }
 
 /* ================================================================
@@ -803,52 +912,40 @@ async function handleSpin() {
 
   S.spinning = true;
   const btn = document.getElementById('spin-btn');
-  btn.disabled = true;
-  btn.classList.add('spinning');
+  btn.disabled = true; btn.classList.add('spinning');
   btn.innerHTML = '<i class="fas fa-sync-alt fa-spin mr-2"></i>GIRANDO...';
 
-  // Esconder indicadores anteriores
   document.querySelectorAll('.payline').forEach(p => p.classList.remove('show'));
   document.querySelectorAll('.slot-cell').forEach(c => c.classList.remove('winning'));
   document.getElementById('win-indicator').style.opacity = '0';
 
-  // Deduzir aposta
-  S.balance = Math.round((S.balance - S.bet) * 100) / 100;
-  updateBalance();
+  S.balance = Math.round((S.balance - S.bet) * 100) / 100; updateBalance();
 
-  // Gerar resultado
+  // NOVO: Som de inicio do giro
+  playSpinStart();
+
   const result = generateResult();
-
-  // Animar colunas
   const cells = document.querySelectorAll('.slot-cell');
   cells.forEach(c => c.classList.add('spinning'));
 
-  // Troca rápida de símbolos
   const spinInt = setInterval(() => {
-    cells.forEach(c => {
-      if (c.classList.contains('spinning')) {
-        c.querySelector('.symbol-display').textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
-      }
-    });
+    cells.forEach(c => { if (c.classList.contains('spinning')) c.querySelector('.symbol-display').textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji; });
   }, 70);
 
-  // Parar colunas com delay
   const colDelays = [500, 900, 1300];
   for (let col = 0; col < 3; col++) {
     await sleep(colDelays[col]);
+    // NOVO: Som de parada do rolo
+    playReelStop();
     for (let row = 0; row < 3; row++) {
       const idx = row * 3 + col;
-      const cell = document.getElementById('cell-' + idx);
-      cell.classList.remove('spinning');
-      const sym = cell.querySelector('.symbol-display');
-      sym.textContent = result[idx].emoji;
-      cell.classList.add('bounce');
-      setTimeout(() => cell.classList.remove('bounce'), 350);
+      const cell = document.getElementById('cell-' + idx); cell.classList.remove('spinning');
+      const sym = cell.querySelector('.symbol-display'); sym.textContent = result[idx].emoji;
+      cell.classList.add('bounce'); setTimeout(() => cell.classList.remove('bounce'), 350);
     }
   }
   clearInterval(spinInt);
 
-  // Calcular ganhos
   const wins = calculateWins(result);
   let totalWin = 0;
 
@@ -856,75 +953,61 @@ async function handleSpin() {
     wins.forEach(win => {
       totalWin += S.bet * win.symbol.multiplier;
       win.cells.forEach(ci => document.getElementById('cell-' + ci).classList.add('winning'));
-      const pl = document.getElementById('payline-' + win.lineIdx);
-      if (pl) pl.classList.add('show');
+      const pl = document.getElementById('payline-' + win.lineIdx); if (pl) pl.classList.add('show');
     });
-
-    S.balance = Math.round((S.balance + totalWin) * 100) / 100;
-    updateBalance();
+    S.balance = Math.round((S.balance + totalWin) * 100) / 100; updateBalance();
     document.getElementById('last-win-display').textContent = totalWin.toFixed(2);
     document.getElementById('win-indicator').style.opacity = '1';
 
+    // NOVO: Sons de vitória
     if (totalWin >= S.bet * 25) {
+      playBigWinSound();
       showWinOverlay(totalWin, totalWin >= S.bet * 50 ? 'MEGA WIN!' : 'BIG WIN!');
       spawnParticles(25);
     } else if (totalWin >= S.bet * 10) {
-      showToast('Mega ganho: +' + totalWin.toFixed(2), 'success');
-      spawnParticles(12);
+      playWinSound();
+      showToast('Mega ganho: +' + totalWin.toFixed(2), 'success'); spawnParticles(12);
     } else {
-      showToast('Ganho: +' + totalWin.toFixed(2), 'success');
-      spawnParticles(5);
+      playWinSound();
+      showToast('Ganho: +' + totalWin.toFixed(2), 'success'); spawnParticles(5);
     }
   } else {
     document.getElementById('last-win-display').textContent = '0.00';
+    // NOVO: Som de perda
+    playLoseSound();
   }
 
-  // Estatísticas
   S.stats.totalSpins++;
   if (totalWin > 0) S.stats.playersWon += totalWin; else S.stats.houseWon += S.bet;
 
-  // Salvar no Firestore
   try {
-    await db.collection('tiger_users').doc(S.uid).update({ credits: S.balance, totalSpins: firebase.firestore.FieldValue.increment(1) });
-    await db.collection('tiger_config').doc('stats').set(S.stats, { merge: true });
-  } catch(e) { console.error('Erro ao salvar:', e); }
+    await db.ref('tigrinho/jogadores/' + S.uid).update({ credits: S.balance, totalSpins: (S.userData.totalSpins || 0) + 1 });
+    S.userData.totalSpins = (S.userData.totalSpins || 0) + 1;
+    await db.ref('tigrinho/stats').update(S.stats);
+  } catch(e) { console.error(e); }
 
-  // Histórico local
   S.history.unshift({ bet: S.bet, win: totalWin, symbols: result.map(s => s.emoji), time: new Date().toLocaleTimeString() });
-  if (S.history.length > 30) S.history.pop();
-  updateHistory();
+  if (S.history.length > 30) S.history.pop(); updateHistory();
 
-  S.spinning = false;
-  btn.disabled = false;
-  btn.classList.remove('spinning');
+  S.spinning = false; btn.disabled = false; btn.classList.remove('spinning');
   btn.innerHTML = '<i class="fas fa-play mr-2"></i>GIRAR';
 
-  if (S.balance <= 0) setTimeout(() => showToast('Creditos acabaram! Contate o admin.', 'error'), 500);
+  if (S.balance <= 0) setTimeout(() => showToast('Creditos acabaram! Faca um deposito ou contate o admin.', 'error'), 500);
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function showWinOverlay(amount, title) {
-  document.getElementById('win-title').textContent = title || 'BIG WIN!';
-  document.getElementById('win-amount-display').textContent = '+' + amount.toFixed(2);
-  document.getElementById('win-overlay').classList.add('show');
-}
-
-function closeWinOverlay() { document.getElementById('win-overlay').classList.remove('show'); }
+function showWinOverlay(amount, title) { document.getElementById('win-title').textContent = title || 'BIG WIN!'; document.getElementById('win-amount-display').textContent = '+' + amount.toFixed(2); document.getElementById('win-overlay').classList.add('show'); }
+function closeWinOverlay() { playClick(); document.getElementById('win-overlay').classList.remove('show'); }
 
 function spawnParticles(n) {
   const emojis = ['✨','🪙','💰','🐅','⭐','💎'];
   for (let i = 0; i < n; i++) {
     setTimeout(() => {
-      const p = document.createElement('div');
-      p.className = 'win-particle';
+      const p = document.createElement('div'); p.className = 'win-particle';
       p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      p.style.left = (15 + Math.random() * 70) + 'vw';
-      p.style.top = (35 + Math.random() * 35) + 'vh';
-      p.style.fontSize = (18 + Math.random() * 14) + 'px';
-      p.style.animationDuration = (1 + Math.random() * 0.8) + 's';
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 2000);
+      p.style.left = (15 + Math.random() * 70) + 'vw'; p.style.top = (35 + Math.random() * 35) + 'vh';
+      p.style.fontSize = (18 + Math.random() * 14) + 'px'; p.style.animationDuration = (1 + Math.random() * 0.8) + 's';
+      document.body.appendChild(p); setTimeout(() => p.remove(), 2000);
     }, i * 80);
   }
 }
@@ -934,14 +1017,8 @@ function updateHistory() {
   if (!S.history.length) { list.innerHTML = '<p class="text-xs" style="color:var(--text-muted);">Nenhuma jogada ainda</p>'; return; }
   list.innerHTML = S.history.slice(0, 12).map(h => `
     <div class="history-item">
-      <div class="flex items-center gap-2">
-        <span style="color:var(--text-muted);font-size:10px;">${h.time}</span>
-        <span style="font-size:14px;">${h.symbols[3]}${h.symbols[4]}${h.symbols[5]}</span>
-      </div>
-      <div>
-        <span style="color:var(--text-muted);font-size:10px;">${h.bet.toFixed(2)}</span>
-        ${h.win > 0 ? '<span class="ml-1 font-bold" style="color:#22c55e;">+' + h.win.toFixed(2) + '</span>' : '<span class="ml-1" style="color:#ef4444;">-</span>'}
-      </div>
+      <div class="flex items-center gap-2"><span style="color:var(--text-muted);font-size:10px;">${h.time}</span><span style="font-size:14px;">${h.symbols[3]}${h.symbols[4]}${h.symbols[5]}</span></div>
+      <div><span style="color:var(--text-muted);font-size:10px;">${h.bet.toFixed(2)}</span>${h.win > 0 ? '<span class="ml-1 font-bold" style="color:#22c55e;">+' + h.win.toFixed(2) + '</span>' : '<span class="ml-1" style="color:#ef4444;">-</span>'}</div>
     </div>`).join('');
 }
 
@@ -957,76 +1034,43 @@ function loadAdminData() {
   document.getElementById('min-bet').value = S.config.minBet;
   document.getElementById('max-bet').value = S.config.maxBet;
   document.getElementById('tiger-mult').value = S.config.tigerMultiplier || SYMBOLS[0].multiplier;
+  // NOVO
+  document.getElementById('payment-link').value = S.config.paymentLink || '';
+  document.getElementById('whatsapp-number').value = S.config.whatsappNumber || '5511999999999';
+  document.getElementById('withdrawal-fee').value = S.config.withdrawalFee || 0;
+  document.getElementById('min-withdrawal').value = S.config.minWithdrawal || 20;
 
-  // Pesos
-  const wc = document.getElementById('symbol-weights');
-  wc.innerHTML = '';
+  const wc = document.getElementById('symbol-weights'); wc.innerHTML = '';
   SYMBOLS.forEach(sym => {
     const w = S.config.symbolWeights[sym.id] || sym.defaultWeight;
-    const d = document.createElement('div');
-    d.className = 'flex items-center gap-2 p-2 rounded-lg';
-    d.style.background = 'rgba(0,0,0,0.25)';
-    d.innerHTML = `
-      <span style="font-size:22px;">${sym.emoji}</span>
-      <div class="flex-1">
-        <div class="text-[10px]" style="color:var(--text-muted);">${sym.name}</div>
-        <input type="range" min="1" max="50" value="${w}" id="wt-${sym.id}" style="height:4px;">
-      </div>
-      <span class="text-xs font-bold" style="color:var(--gold);" id="wtv-${sym.id}">${w}</span>`;
+    const d = document.createElement('div'); d.className = 'flex items-center gap-2 p-2 rounded-lg'; d.style.background = 'rgba(0,0,0,0.25)';
+    d.innerHTML = `<span style="font-size:22px;">${sym.emoji}</span><div class="flex-1"><div class="text-[10px]" style="color:var(--text-muted);">${sym.name}</div><input type="range" min="1" max="50" value="${w}" id="wt-${sym.id}" style="height:4px;"></div><span class="text-xs font-bold" style="color:var(--gold);" id="wtv-${sym.id}">${w}</span>`;
     wc.appendChild(d);
-    setTimeout(() => {
-      const sl = document.getElementById('wt-' + sym.id);
-      if (sl) sl.addEventListener('input', () => document.getElementById('wtv-' + sym.id).textContent = sl.value);
-    }, 0);
+    setTimeout(() => { const sl = document.getElementById('wt-' + sym.id); if (sl) sl.addEventListener('input', () => document.getElementById('wtv-' + sym.id).textContent = sl.value); }, 0);
   });
-
-  loadUsersList();
-  updateStats();
+  loadUsersList(); updateStats(); loadWithdrawals();
 }
 
 async function loadUsersList() {
   const c = document.getElementById('users-list');
   try {
-    const snap = await db.collection('tiger_users').orderBy('createdAt', 'desc').get();
-    const users = [];
-    snap.forEach(doc => users.push({ uid: doc.id, ...doc.data() }));
-    document.getElementById('stat-users').textContent = users.length;
-    renderUsers(c, users);
-  } catch(e) {
-    // Fallback: sem ordenação
-    try {
-      const snap = await db.collection('tiger_users').get();
-      const users = [];
-      snap.forEach(doc => users.push({ uid: doc.id, ...doc.data() }));
-      document.getElementById('stat-users').textContent = users.length;
-      renderUsers(c, users);
-    } catch(e2) {
-      c.innerHTML = '<p class="text-xs" style="color:#ef4444;">Erro ao carregar usuarios</p>';
-    }
-  }
+    const snap = await db.ref('tigrinho/jogadores').once('value');
+    const users = []; snap.forEach(child => users.push({ uid: child.key, ...child.val() }));
+    document.getElementById('stat-users').textContent = users.length; renderUsers(c, users);
+  } catch(e) { c.innerHTML = '<p class="text-xs" style="color:#ef4444;">Erro ao carregar</p>'; }
 }
 
 function renderUsers(container, users) {
   if (!users.length) { container.innerHTML = '<p class="text-xs" style="color:var(--text-muted);">Nenhum usuario</p>'; return; }
   container.innerHTML = users.map(u => `
     <div class="user-row">
-      <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style="background:rgba(255,215,0,0.08);border:1px solid var(--border-gold);color:var(--gold);">
-        ${(u.name||u.email)[0].toUpperCase()}
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="font-semibold text-xs truncate">${u.name||'Sem nome'} ${u.isAdmin?'<i class="fas fa-crown text-yellow-500 ml-1"></i>':''}</div>
-        <div class="text-[10px] truncate" style="color:var(--text-muted);">${u.email}</div>
-      </div>
-      <div class="text-right mr-1">
-        <div class="font-bold text-xs" style="color:var(--gold);">${(u.credits||0).toFixed(2)}</div>
-        <div class="text-[10px]" style="color:var(--text-muted);">${u.totalSpins||0} giros</div>
-      </div>
+      <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style="background:rgba(255,215,0,0.08);border:1px solid var(--border-gold);color:var(--gold);">${(u.name||u.email)[0].toUpperCase()}</div>
+      <div class="flex-1 min-w-0"><div class="font-semibold text-xs truncate">${u.name||'Sem nome'} ${u.isAdmin?'<i class="fas fa-crown text-yellow-500 ml-1"></i>':''}</div><div class="text-[10px] truncate" style="color:var(--text-muted);">${u.email}</div></div>
+      <div class="text-right mr-1"><div class="font-bold text-xs" style="color:var(--gold);">${(u.credits||0).toFixed(2)}</div><div class="text-[10px]" style="color:var(--text-muted);">${u.totalSpins||0} giros</div></div>
       <div class="flex gap-1">
         <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="quickCredits('${u.uid}',50)">+50</button>
         <button class="admin-btn admin-btn-danger admin-btn-sm" onclick="quickCredits('${u.uid}',-50)">-50</button>
-        <button class="admin-btn admin-btn-sm" style="background:rgba(255,215,0,0.08);color:var(--gold);border:1px solid var(--border-gold);" onclick="toggleAdmin('${u.uid}',${!u.isAdmin})" title="${u.isAdmin?'Remover admin':'Tornar admin'}">
-          <i class="fas fa-crown"></i>
-        </button>
+        <button class="admin-btn admin-btn-sm" style="background:rgba(255,215,0,0.08);color:var(--gold);border:1px solid var(--border-gold);" onclick="toggleAdmin('${u.uid}',${!u.isAdmin})"><i class="fas fa-crown"></i></button>
       </div>
     </div>`).join('');
 }
@@ -1040,18 +1084,9 @@ function updateStats() {
 async function saveConfig() {
   S.config.winRate = parseInt(document.getElementById('win-rate-slider').value);
   S.config.bigWinRate = parseInt(document.getElementById('big-win-slider').value);
-
-  SYMBOLS.forEach(sym => {
-    const sl = document.getElementById('wt-' + sym.id);
-    if (sl) S.config.symbolWeights[sym.id] = parseInt(sl.value);
-  });
-
-  try {
-    await db.collection('tiger_config').doc('game').set(S.config, { merge: true });
-    showToast('Configuracoes salvas!', 'success');
-  } catch(e) {
-    showToast('Erro ao salvar: ' + e.message, 'error');
-  }
+  SYMBOLS.forEach(sym => { const sl = document.getElementById('wt-' + sym.id); if (sl) S.config.symbolWeights[sym.id] = parseInt(sl.value); });
+  try { await db.ref('tigrinho/config').update(S.config); showToast('Configuracoes salvas!', 'success'); }
+  catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 async function saveGeneralConfig() {
@@ -1059,31 +1094,26 @@ async function saveGeneralConfig() {
   S.config.minBet = parseFloat(document.getElementById('min-bet').value) || 1;
   S.config.maxBet = parseFloat(document.getElementById('max-bet').value) || 100;
   S.config.tigerMultiplier = parseFloat(document.getElementById('tiger-mult').value) || 50;
-  SYMBOLS[0].multiplier = S.config.tigerMultiplier;
-  buildPaytable();
-
-  try {
-    await db.collection('tiger_config').doc('game').set(S.config, { merge: true });
-    showToast('Configuracoes gerais salvas!', 'success');
-  } catch(e) {
-    showToast('Erro ao salvar: ' + e.message, 'error');
-  }
+  // NOVO
+  S.config.paymentLink = document.getElementById('payment-link').value.trim();
+  S.config.whatsappNumber = document.getElementById('whatsapp-number').value.trim() || '5511999999999';
+  S.config.withdrawalFee = parseFloat(document.getElementById('withdrawal-fee').value) || 0;
+  S.config.minWithdrawal = parseFloat(document.getElementById('min-withdrawal').value) || 20;
+  SYMBOLS[0].multiplier = S.config.tigerMultiplier; buildPaytable();
+  updateWhatsAppLink();
+  try { await db.ref('tigrinho/config').update(S.config); showToast('Config gerais salvas!', 'success'); }
+  catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 async function quickCredits(uid, amount) {
   try {
-    await db.collection('tiger_users').doc(uid).update({ credits: firebase.firestore.FieldValue.increment(amount) });
-    // Se for o usuário logado, atualizar local
-    if (uid === S.uid) {
-      S.balance = Math.round((S.balance + amount) * 100) / 100;
-      S.balance = Math.max(0, S.balance);
-      updateBalance();
-    }
-    loadUsersList();
-    showToast((amount > 0 ? '+' : '') + amount + ' creditos aplicados', 'success');
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
+    const snap = await db.ref('tigrinho/jogadores/' + uid + '/credits').once('value');
+    const currentCredits = snap.val() || 0;
+    const newCredits = Math.max(0, Math.round((currentCredits + amount) * 100) / 100);
+    await db.ref('tigrinho/jogadores/' + uid).update({ credits: newCredits });
+    if (uid === S.uid) { S.balance = newCredits; updateBalance(); }
+    loadUsersList(); showToast((amount > 0 ? '+' : '') + amount + ' creditos aplicados', 'success');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 async function adminAddCredits() {
@@ -1091,88 +1121,98 @@ async function adminAddCredits() {
   const amount = parseFloat(document.getElementById('admin-credit-amount').value);
   if (!email) { showToast('Digite o email', 'error'); return; }
   if (isNaN(amount)) { showToast('Valor invalido', 'error'); return; }
-
   try {
-    const snap = await db.collection('tiger_users').where('email', '==', email).limit(1).get();
-    if (snap.empty) { showToast('Usuario nao encontrado', 'error'); return; }
-    const doc = snap.docs[0];
-    await db.collection('tiger_users').doc(doc.id).update({ credits: firebase.firestore.FieldValue.increment(amount) });
-    if (doc.id === S.uid) {
-      S.balance = Math.round((S.balance + amount) * 100) / 100;
-      updateBalance();
-    }
-    loadUsersList();
-    showToast('Creditos adicionados a ' + email, 'success');
+    const snap = await db.ref('tigrinho/jogadores').orderByChild('email').equalTo(email).limitToFirst(1).once('value');
+    if (!snap.exists()) { showToast('Usuario nao encontrado', 'error'); return; }
+    let uid = null; snap.forEach(child => { uid = child.key; });
+    const currentCredits = snap.val()[uid].credits || 0;
+    const newCredits = Math.max(0, Math.round((currentCredits + amount) * 100) / 100);
+    await db.ref('tigrinho/jogadores/' + uid).update({ credits: newCredits });
+    if (uid === S.uid) { S.balance = newCredits; updateBalance(); }
+    loadUsersList(); showToast('Creditos adicionados a ' + email, 'success');
     document.getElementById('admin-user-email').value = '';
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 async function toggleAdmin(uid, makeAdmin) {
+  try { await db.ref('tigrinho/jogadores/' + uid).update({ isAdmin: makeAdmin }); loadUsersList(); showToast(makeAdmin ? 'Admin atribuido!' : 'Admin removido!', 'success'); }
+  catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+/* ================================================================
+   NOVO: GERENCIAR SAQUES (ADMIN)
+   ================================================================ */
+async function loadWithdrawals() {
+  const c = document.getElementById('withdrawals-list');
   try {
-    await db.collection('tiger_users').doc(uid).update({ isAdmin: makeAdmin });
-    loadUsersList();
-    showToast(makeAdmin ? 'Admin atribuido!' : 'Admin removido!', 'success');
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
+    const snap = await db.ref('tigrinho/saques').orderByChild('createdAt').once('value');
+    const items = [];
+    snap.forEach(child => items.push({ id: child.key, ...child.val() }));
+    // Mais recentes primeiro
+    items.reverse();
+    if (!items.length) { c.innerHTML = '<p class="text-xs" style="color:var(--text-muted);">Nenhuma solicitacao de saque</p>'; return; }
+    c.innerHTML = items.map(item => {
+      const statusClass = item.status === 'approved' ? 'approved' : item.status === 'rejected' ? 'rejected' : 'pending';
+      const statusText = item.status === 'approved' ? 'APROVADO' : item.status === 'rejected' ? 'REJEITADO' : 'PENDENTE';
+      const date = item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '';
+      return `<div class="saque-row">
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-xs truncate">${item.name||item.email}</div>
+          <div class="text-[10px]" style="color:var(--text-muted);">${item.pixType}: ${item.pixKey}</div>
+          <div class="text-[10px]" style="color:var(--text-muted);">${date}</div>
+        </div>
+        <div class="text-right">
+          <div class="font-bold text-xs" style="color:var(--gold);">R$ ${item.amount.toFixed(2)}</div>
+          <div class="text-[10px]" style="color:var(--green);">Recebe: R$ ${(item.receiveAmount||item.amount).toFixed(2)}</div>
+          <span class="saque-badge ${statusClass}">${statusText}</span>
+        </div>
+        ${item.status === 'pending' ? `
+          <div class="flex gap-1 mt-1 w-full">
+            <button class="admin-btn admin-btn-primary admin-btn-sm flex-1" onclick="approveWithdrawal('${item.id}','${item.uid}',${item.amount})"><i class="fas fa-check mr-1"></i>Aprovar</button>
+            <button class="admin-btn admin-btn-danger admin-btn-sm flex-1" onclick="rejectWithdrawal('${item.id}')"><i class="fas fa-times mr-1"></i>Rejeitar</button>
+          </div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) { c.innerHTML = '<p class="text-xs" style="color:#ef4444;">Erro ao carregar saques</p>'; }
+}
+
+async function approveWithdrawal(saqueId, uid, amount) {
+  try {
+    await db.ref('tigrinho/saques/' + saqueId).update({ status: 'approved', processedAt: firebase.database.ServerValue.TIMESTAMP });
+    loadWithdrawals();
+    showToast('Saque aprovado!', 'success');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+async function rejectWithdrawal(saqueId) {
+  try {
+    // Devolver creditos ao usuario
+    const snap = await db.ref('tigrinho/saques/' + saqueId).once('value');
+    if (snap.exists()) {
+      const data = snap.val();
+      const userSnap = await db.ref('tigrinho/jogadores/' + data.uid + '/credits').once('value');
+      const currentCredits = userSnap.val() || 0;
+      await db.ref('tigrinho/jogadores/' + data.uid).update({ credits: Math.round((currentCredits + data.amount) * 100) / 100 });
+    }
+    await db.ref('tigrinho/saques/' + saqueId).update({ status: 'rejected', processedAt: firebase.database.ServerValue.TIMESTAMP });
+    loadWithdrawals();
+    showToast('Saque rejeitado - creditos devolvidos', 'success');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 /* ================================================================
    PARTÍCULAS DE FUNDO
    ================================================================ */
 function initBgCanvas() {
-  const cv = document.getElementById('bg-canvas');
-  const ctx = cv.getContext('2d');
-  const particles = [];
-  const MAX = 35;
-
+  const cv = document.getElementById('bg-canvas'); const ctx = cv.getContext('2d'); const particles = []; const MAX = 35;
   function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  class P {
-    constructor() { this.reset(true); }
-    reset(init) {
-      this.x = Math.random() * cv.width;
-      this.y = init ? Math.random() * cv.height : cv.height + 10;
-      this.r = Math.random() * 1.8 + 0.4;
-      this.vx = (Math.random() - 0.5) * 0.25;
-      this.vy = -(Math.random() * 0.4 + 0.08);
-      this.o = Math.random() * 0.35 + 0.05;
-      this.life = Math.random() * 300 + 150;
-      this.maxLife = this.life;
-    }
-    update() {
-      this.x += this.vx; this.y += this.vy; this.life--;
-      this.o = (this.life / this.maxLife) * 0.35;
-      if (this.life <= 0 || this.y < -10) this.reset(false);
-    }
-    draw() {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, Math.max(0.1, this.r), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,215,0,' + this.o + ')';
-      ctx.fill();
-    }
-  }
-
+  resize(); window.addEventListener('resize', resize);
+  class P { constructor() { this.reset(true); } reset(init) { this.x = Math.random() * cv.width; this.y = init ? Math.random() * cv.height : cv.height + 10; this.r = Math.random() * 1.8 + 0.4; this.vx = (Math.random() - 0.5) * 0.25; this.vy = -(Math.random() * 0.4 + 0.08); this.o = Math.random() * 0.35 + 0.05; this.life = Math.random() * 300 + 150; this.maxLife = this.life; } update() { this.x += this.vx; this.y += this.vy; this.life--; this.o = (this.life / this.maxLife) * 0.35; if (this.life <= 0 || this.y < -10) this.reset(false); } draw() { ctx.beginPath(); ctx.arc(this.x, this.y, Math.max(0.1, this.r), 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,215,0,' + this.o + ')'; ctx.fill(); } }
   for (let i = 0; i < MAX; i++) { const p = new P(); p.life = Math.random() * p.maxLife; particles.push(p); }
-
-  (function loop() {
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(loop);
-  })();
+  (function loop() { ctx.clearRect(0, 0, cv.width, cv.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(loop); })();
 }
 
-/* ================================================================
-   INIT
-   ================================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-  initBgCanvas();
-  // Auth state observer já cuida de tudo
-});
+document.addEventListener('DOMContentLoaded', () => { initBgCanvas(); });
 </script>
 </body>
-</html>
+  </html>
